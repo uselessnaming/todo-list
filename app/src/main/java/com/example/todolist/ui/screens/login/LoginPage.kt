@@ -41,8 +41,8 @@ import com.example.todolist.ui.theme.TodoListTheme
 fun LoginPage(
     navController : NavController
 ){
-    var idValue by remember{mutableStateOf("")}
-    var passwdValue by remember{mutableStateOf("")}
+    var id by remember{mutableStateOf("")}
+    var passwd by remember{mutableStateOf("")}
 
     Column(
         modifier = Modifier
@@ -62,9 +62,9 @@ fun LoginPage(
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(),
-            value = idValue,
+            value = id,
             onValueChange = {
-                idValue = it
+                id = it
             },
             placeholder = {
                 Text(
@@ -86,9 +86,9 @@ fun LoginPage(
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(),
-            value = passwdValue,
+            value = passwd,
             onValueChange = {
-                passwdValue = it
+                passwd = it
             },
             placeholder = {
                 Text(
