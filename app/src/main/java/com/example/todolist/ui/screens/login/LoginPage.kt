@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,16 +50,14 @@ fun LoginPage(
             .background(color = Color.White)
             .padding(top = 10.dp, start = 20.dp, end = 20.dp)
     ){
-        Spacer(Modifier.weight(1f))
-
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Login",
+            text = "로그인",
             fontSize = 30.sp,
             textAlign = TextAlign.Center
         )
 
-        Spacer(Modifier.height(30.dp))
+        Spacer(Modifier.weight(1f))
 
         OutlinedTextField(
             modifier = Modifier
@@ -71,7 +70,7 @@ fun LoginPage(
                 Text(
                     text = "아디이를 입력해주세요",
                     fontSize = 20.sp,
-                    color = Color.LightGray
+                    color = LightGray
                 )
             },
             textStyle = TextStyle(
@@ -95,7 +94,7 @@ fun LoginPage(
                 Text(
                     text = "비밀번호를 입력해주세요",
                     fontSize = 20.sp,
-                    color = Color.LightGray
+                    color = LightGray
                 )
             },
             textStyle = TextStyle(
@@ -111,6 +110,7 @@ fun LoginPage(
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
+
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MainColor
@@ -135,7 +135,7 @@ fun LoginPage(
 
                     },
                 text = "회원가입",
-                color = Color.LightGray,
+                color = LightGray,
                 textAlign = TextAlign.Center
             )
 
@@ -145,7 +145,7 @@ fun LoginPage(
 
                     },
                 text = "아이디 찾기",
-                color = Color.LightGray,
+                color = LightGray,
                 textAlign = TextAlign.Center
             )
 
@@ -155,7 +155,7 @@ fun LoginPage(
 
                     },
                 text = "비밀번호 찾기",
-                color = Black,
+                color = LightGray,
                 textAlign = TextAlign.Center
             )
         }
