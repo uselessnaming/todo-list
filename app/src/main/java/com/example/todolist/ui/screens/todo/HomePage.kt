@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -55,7 +57,7 @@ fun HomePage(
     var selectedMonth by remember{mutableStateOf(LocalDate.now().monthValue+1)}
 
     //scroll state
-    var monthScrollState = rememberLazyListState(months.indexOf(selectedMonth))
+    val monthScrollState = rememberLazyListState(months.indexOf(selectedMonth))
 
     //화면 변수
     val configuration = LocalConfiguration.current
@@ -91,36 +93,56 @@ fun HomePage(
         ){
             items(months){
                 val isSelected = selectedMonth == it
-                Box(
-                    modifier = Modifier.size(40.dp)
-                        .background(
-                            color = if (isSelected) LightGray else Transparent,
-                            shape = CircleShape
-                        )
-                        .clickable {
-                            selectedMonth = it
-                        },
-                    contentAlignment = Alignment.Center
+                Column(
+                    modifier = Modifier.width(40.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ){
-                    if (it == 0){
-                        Spacer(Modifier.fillMaxSize())
-                    } else {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(top = 5.dp)
-                                .focusable(isSelected),
-                            text = it.toString(),
-                            fontSize = 20.sp,
-                            color = if(isSelected) Black else LightGray,
-                            textAlign = TextAlign.Center
-                        )
+                    Box(
+                        modifier = Modifier.size(40.dp)
+                            .background(
+                                color = if (isSelected) LightGray else Transparent,
+                                shape = CircleShape
+                            )
+                            .clickable {
+                                selectedMonth = it
+                            },
+                        contentAlignment = Alignment.Center
+                    ){
+                        if (it == 0){
+                            Spacer(Modifier.fillMaxSize())
+                        } else {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(top = 5.dp)
+                                    .focusable(isSelected),
+                                text = it.toString(),
+                                fontSize = 20.sp,
+                                color = if(isSelected) Black else LightGray,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
-                }
-                LaunchedEffect(selectedMonth){
-                    monthScrollState.animateScrollToItem(months.indexOf(selectedMonth),(-screenWidthPx/2).toInt())
+
+                    //월별 투두 개수
+                    Text(
+                        modifier = Modifier.width(40.dp),
+                        text = "total",
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        color = if(isSelected) Black else LightGray
+                    )
                 }
             }
+        }
+
+        Spacer(Modifier.height(10.dp))
+
+
+
+        //selectedMonth가 변결될 경우 Event
+        LaunchedEffect(selectedMonth){
+            monthScrollState.animateScrollToItem(months.indexOf(selectedMonth),(-screenWidthPx/2).toInt())
         }
     }
 }
