@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,8 +23,13 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.LightGray
@@ -56,7 +63,7 @@ import java.time.LocalDate
 fun HomePage(
     navController: NavController
 ){
-    val months = listOf(0,0,0,1,2,3,4,5,6,7,8,9,10,11,12,0,0,0)
+    val months = listOf(0,0,0,0,1,2,3,4,5,6,7,8,9,10,11,12,0,0,0,0)
     val years = (2000..2050).toList()
 
     //선택된 month
@@ -70,128 +77,188 @@ fun HomePage(
 
     //화면 변수
     val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp - 170.dp
+    val screenWidth = configuration.screenWidthDp.dp - 85.dp
     val screenWidthPx = with(LocalDensity.current){screenWidth.toPx()}
+    val screenHeight = configuration.screenHeightDp.dp
 
     //todos
-    val todos = listOf("title")
+    val todos = listOf("title","title2","title3")
 
-    Box(
-        modifier = Modifier.fillMaxSize()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = White)
     ){
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = White)
-                .padding(horizontal = 20.dp)
+        Box(
+            modifier = Modifier.height(screenHeight - 50.dp)
         ){
-            TopBar(
-                title = "홈페이지",
-                navIcon = Icons.Filled.Home,
-                navDes = "Home Icon",
-                navSize = 30.dp,
-                onNavClick = {
-
-                },
-                actionIcon = Icons.Filled.Menu,
-                actionDes = "Menu",
-                actionSize = 30.dp,
-                onActionClick = {
-
-                }
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp)
             ){
-                Spinner(
-                    modifier = Modifier.width(100.dp),
-                    value = "${selectedYear}년",
-                    onValueChanged = {
+                TopBar(
+                    title = "홈페이지",
+                    navIcon = Icons.Filled.Home,
+                    navDes = "Home Icon",
+                    navSize = 30.dp,
+                    onNavClick = {
+
+                    },
+                    actionIcon = Icons.Filled.Menu,
+                    actionDes = "Menu",
+                    actionSize = 30.dp,
+                    onActionClick = {
 
                     }
                 )
 
-                Spacer(Modifier.width(5.dp))
-
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    state = monthScrollState
+                //년도 선택
+                Row(
+                    modifier = Modifier.fillMaxWidth()
                 ){
-                    items(months){
-                        val isSelected = selectedMonth == it
-                        Column(
-                            modifier = Modifier.width(40.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ){
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .background(
-                                        color = if (isSelected) LightGray else Transparent,
-                                        shape = CircleShape
-                                    )
-                                    .clickable {
-                                        selectedMonth = it
-                                    },
-                                contentAlignment = Alignment.Center
+                    Spinner(
+                        modifier = Modifier.width(100.dp),
+                        value = selectedYear,
+                        onValueChanged = {
+                            selectedYear = it
+                        },
+                        items = years
+                    )
+                }
+
+                Spacer(Modifier.height(5.dp))
+
+                //월 선택
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ){
+                    LazyRow(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        state = monthScrollState
+                    ){
+                        items(months){
+                            val isSelected = selectedMonth == it
+                            Column(
+                                modifier = Modifier.width(40.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ){
-                                if (it == 0){
-                                    Spacer(Modifier.fillMaxSize())
-                                } else {
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(
+                                            color = if (isSelected) LightGray else Transparent,
+                                            shape = CircleShape
+                                        )
+                                        .clickable {
+                                            if (it != 0) {
+                                                selectedMonth = it
+                                            }
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ){
+                                    if (it == 0){
+                                        Spacer(Modifier.fillMaxSize())
+                                    } else {
+                                        Text(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(top = 5.dp)
+                                                .focusable(isSelected),
+                                            text = it.toString(),
+                                            fontSize = 20.sp,
+                                            color = if(isSelected) Black else LightGray,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+
+                                if (it != 0){
+                                    //월별 투두 개수
                                     Text(
                                         modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(top = 5.dp)
-                                            .focusable(isSelected),
-                                        text = it.toString(),
-                                        fontSize = 20.sp,
-                                        color = if(isSelected) Black else LightGray,
-                                        textAlign = TextAlign.Center
+                                            .width(40.dp)
+                                            .height(20.dp),
+                                        text = "total",
+                                        fontSize = 14.sp,
+                                        textAlign = TextAlign.Center,
+                                        color = if(isSelected) Black else LightGray
                                     )
                                 }
                             }
+                        }
+                    }
+                }
 
-                            if (it != 0){
-                                //월별 투두 개수
+                Spacer(Modifier.height(10.dp))
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ){
+                    items(todos){
+                        //item별 click 상태
+                        var isClicked by remember{mutableStateOf(false)}
+
+                        TodoItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    isClicked = !isClicked
+                                }
+                        )
+
+                        //눌렀을 떄 세부 설명
+                        if (isClicked){
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
                                 Text(
-                                    modifier = Modifier.width(40.dp),
-                                    text = "total",
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = "세부 설명",
                                     fontSize = 14.sp,
-                                    textAlign = TextAlign.Center,
-                                    color = if(isSelected) Black else LightGray
                                 )
                             }
                         }
                     }
                 }
-            }
 
-            Spacer(Modifier.height(10.dp))
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ){
-                items(todos){
-                    TodoItem(
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                //selectedMonth가 변결될 경우 Event
+                LaunchedEffect(selectedMonth){
+                    monthScrollState.animateScrollToItem(months.indexOf(selectedMonth),(-screenWidthPx/2).toInt())
                 }
             }
+        }
 
-
-            //selectedMonth가 변결될 경우 Event
-            LaunchedEffect(selectedMonth){
-                monthScrollState.animateScrollToItem(months.indexOf(selectedMonth),(-screenWidthPx/2).toInt())
-            }
-
-            //selectedYear가 변경될 경우 Event
-            LaunchedEffect(selectedYear){
+        //floating action button
+        Row(
+            modifier = Modifier
+                .height(50.dp)
+                .fillMaxWidth()
+                .padding(end = 20.dp, bottom = 20.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            FloatingActionButton(
+                modifier = Modifier
+                    .size(30.dp)
+                    .background(color = Transparent, shape = CircleShape),
+                onClick = {
+                }
+            ) {
+                Icon(
+                    modifier = Modifier.fillMaxSize(),
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add Floating Button",
+                    tint = Black
+                )
             }
         }
-        //floating action button
     }
 }
 
