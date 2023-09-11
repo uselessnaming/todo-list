@@ -71,7 +71,6 @@ fun HomePage(
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp - 85.dp
     val screenWidthPx = with(LocalDensity.current){screenWidth.toPx()}
-    val screenHeight = configuration.screenHeightDp.dp
 
     //todos
     val todos = listOf("title","title2","title3")

@@ -2,6 +2,7 @@ package com.example.todolist.module
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.todolist.Data.SignInReqDto
 import com.example.todolist.Data.SignUpReqDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -25,4 +26,12 @@ class TodoViewModel @Inject constructor(
         }
     }
 
+    fun login(signInReqDto : SignInReqDto){
+        viewModelScope.launch(Dispatchers.IO){
+            val result = repository.login(signInReqDto)
+
+            //로그인 후 처리 필요
+            
+        }
+    }
 }

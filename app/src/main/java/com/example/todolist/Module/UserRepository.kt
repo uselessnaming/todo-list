@@ -1,5 +1,7 @@
 package com.example.todolist.module
 
+import com.example.todolist.Data.SignInReqDto
+import com.example.todolist.Data.SignInRespDto
 import com.example.todolist.Data.SignUpReqDto
 import com.example.todolist.Data.SignUpRespDto
 import com.example.todolist.Module.UserApi
@@ -18,6 +20,21 @@ class UserRepository @Inject constructor(
         return if(response.isSuccessful) {
             when(response.code()){
                 201 -> response.body() ?: throw NullPointerException("응답 데이터가 없습니다.")
+                else -> throw Exception("${response.code()} : 오류")
+            }
+        } else {
+            throw Exception("서버 오류 : ${response.code()}")
+        }
+    }
+
+    suspend fun login(signInReqDto : SignInReqDto) : SignInRespDto {
+        val call = userApi.login(signInReqDto)
+
+        val response = call.execute()
+
+        return if(response.isSuccessful){
+            when(response.code()){
+                201 -> response.body() ?: throw NullPointerException("Data is NULL")
                 else -> throw Exception("${response.code()} : 오류")
             }
         } else {
