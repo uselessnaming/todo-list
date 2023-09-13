@@ -1,10 +1,14 @@
-package com.example.todolist.module
+package com.example.todolist.Module
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todolist.Data.SignInReqDto
 import com.example.todolist.Data.SignUpReqDto
+import com.example.todolist.Data.saveAuthToken
+import com.example.todolist.Module.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,8 +17,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TodoViewModel @Inject constructor(
-    private val repository : UserRepository
+    private val repository : UserRepository,
+    @ApplicationContext private val context : Context
 ) : ViewModel() {
+
+    private val _isLogin = MutableStateFlow(false)
+    val isLogin : StateFlow<Boolean> = _isLogin
 
     //error msg 관리
     private val _errMsg = MutableStateFlow<String?>(null)
@@ -31,7 +39,10 @@ class TodoViewModel @Inject constructor(
             val result = repository.login(signInReqDto)
 
             //로그인 후 처리 필요
-            
+            if (result.result == "Success"){
+                _isLogin.value = true
+                saveAuthToken(context, result.token)
+            }
         }
     }
 }

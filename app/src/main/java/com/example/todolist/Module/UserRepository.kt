@@ -1,10 +1,9 @@
-package com.example.todolist.module
+package com.example.todolist.Module
 
 import com.example.todolist.Data.SignInReqDto
 import com.example.todolist.Data.SignInRespDto
 import com.example.todolist.Data.SignUpReqDto
 import com.example.todolist.Data.SignUpRespDto
-import com.example.todolist.Module.UserApi
 import javax.inject.Inject
 
 

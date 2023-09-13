@@ -12,7 +12,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val USER_URL = "http://ec2-3-36-184-17.ap-northeast-2.compute.amazonaws.com:8080/v3/api-docs"
+    private const val USER_URL = "http://ec2-3-36-184-17.ap-northeast-2.compute.amazonaws.com:8080/v3/api-docs/"
 
     @Provides
     @Singleton
