@@ -160,7 +160,7 @@ fun LoginPage(
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-
+                        navController.navigate(Screens.AddUserPage.name)
                     },
                 text = "회원가입",
                 color = LightGray,

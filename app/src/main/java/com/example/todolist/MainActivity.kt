@@ -10,6 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.todolist.ui.screens.login.AddUserPage
+import com.example.todolist.ui.screens.login.FindIdPage
+import com.example.todolist.ui.screens.login.FindPasswdPage
 import com.example.todolist.ui.screens.todo.MainPage
 import com.example.todolist.ui.theme.TodoListTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,6 +34,15 @@ class MainActivity : ComponentActivity() {
                     ){
                         composable(Screens.LoginPage.name){
                             LoginPage(navController)
+                        }
+                        composable(Screens.AddUserPage.name){
+                            AddUserPage(navController)
+                        }
+                        composable(Screens.FindIdPage.name){
+                            FindIdPage(navController)
+                        }
+                        composable(Screens.FindPasswdPage.name){
+                            FindPasswdPage(navController)
                         }
                         composable(Screens.MainPage.name){
                             MainPage(navController)

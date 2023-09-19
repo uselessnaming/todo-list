@@ -1,6 +1,7 @@
 package com.example.todolist.Module
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todolist.Data.SignInReqDto
@@ -20,6 +21,7 @@ class TodoViewModel @Inject constructor(
     private val repository : UserRepository,
     @ApplicationContext private val context : Context
 ) : ViewModel() {
+    val TAG = "TodoViewModel"
 
     private val _isLogin = MutableStateFlow(false)
     val isLogin : StateFlow<Boolean> = _isLogin
@@ -38,8 +40,10 @@ class TodoViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO){
             val result = repository.login(signInReqDto)
 
+            Log.d(TAG,"result : ${result.result}")
+
             //로그인 후 처리 필요
-            if (result.result == "Success"){
+            if (result.result == "SUCCESS"){
                 _isLogin.value = true
                 saveAuthToken(context, result.token)
             }

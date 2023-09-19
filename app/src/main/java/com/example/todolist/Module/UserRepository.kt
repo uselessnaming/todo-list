@@ -1,5 +1,6 @@
 package com.example.todolist.Module
 
+import android.util.Log
 import com.example.todolist.Data.SignInReqDto
 import com.example.todolist.Data.SignInRespDto
 import com.example.todolist.Data.SignUpReqDto
@@ -10,8 +11,10 @@ import javax.inject.Inject
 class UserRepository @Inject constructor(
     private val userApi : UserApi
 ) {
+    val TAG = "UserRepository"
+
     suspend fun addUser(signUpReqDto: SignUpReqDto) : SignUpRespDto {
-        val call = userApi.addUser(signUpReqDto)
+        val call = userApi.signUp(signUpReqDto)
 
         val response = call.execute()
 
@@ -27,9 +30,13 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun login(signInReqDto : SignInReqDto) : SignInRespDto {
-        val call = userApi.login(signInReqDto)
+        val call = userApi.signIn(signInReqDto)
+
+        Log.d(TAG,"call : ${call}")
 
         val response = call.execute()
+
+        Log.d(TAG,"response : ${response}")
 
         return if(response.isSuccessful){
             when(response.code()){
