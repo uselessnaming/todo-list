@@ -12,9 +12,9 @@ interface UserApi {
 
     //로그인
     @POST("/sign-api/sign-in")
-    suspend fun signIn(@Body signInReqDto : SignInReqDto) : Call<SignInRespDto>
+    fun signIn(@Body signInReqDto : SignInReqDto) : Call<SignInRespDto>
 
     //회원가입
     @POST("/sign-api/sign-up")
-    suspend fun signUp(@Body signUpReqDto : SignUpReqDto) : Call<SignUpRespDto>
+    fun signUp(@Body signUpReqDto : SignUpReqDto) : Call<SignUpRespDto>
 }

@@ -6,7 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -32,9 +34,6 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = Screens.LoginPage.name
                     ){
-                        composable(Screens.LoginPage.name){
-                            LoginPage(navController)
-                        }
                         composable(Screens.AddUserPage.name){
                             AddUserPage(navController)
                         }
@@ -44,8 +43,17 @@ class MainActivity : ComponentActivity() {
                         composable(Screens.FindPasswdPage.name){
                             FindPasswdPage(navController)
                         }
+                        composable(Screens.LoginPage.name){
+                            LoginPage(navController)
+                        }
                         composable(Screens.MainPage.name){
-                            MainPage(navController)
+                            val parentEntry = remember(it){
+                                navController.getBackStackEntry(Screens.LoginPage.name)
+                            }
+                            MainPage(
+                                navController = navController,
+                                todoViewModel = hiltViewModel(parentEntry)
+                            )
                         }
                         composable(Screens.SettingPage.name){
 //                            SettingPage()
