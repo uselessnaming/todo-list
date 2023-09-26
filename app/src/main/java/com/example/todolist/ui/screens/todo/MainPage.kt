@@ -146,21 +146,26 @@ fun MainPage(
                         }
                     }
                 ) {
-                    when (selectedMenu){
-                        Icons.Filled.Home -> HomePage(
-                            openDrawer = {
-                                coroutineScope.launch(Dispatchers.Main){
-                                    drawerState.open()
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        when (selectedMenu){
+                            Icons.Filled.Home -> HomePage(
+                                openDrawer = {
+                                    coroutineScope.launch(Dispatchers.Main){
+                                        drawerState.open()
+                                    }
+                                },
+                                closeDrawer = {
+                                    coroutineScope.launch(Dispatchers.Main){
+                                        drawerState.close()
+                                    }
+                                },
+                                navUp = {
+
                                 }
-                            },
-                            closeDrawer = {
-                                coroutineScope.launch(Dispatchers.Main){
-                                    drawerState.close()
-                                }
-                            }
-                        )
-                        Icons.Filled.Person -> MyPage()
-                        Icons.Filled.Settings -> SettingPage()
+                            )
+                            Icons.Filled.Person -> MyPage()
+                            Icons.Filled.Settings -> SettingPage()
+                        }
                     }
                 }
             }

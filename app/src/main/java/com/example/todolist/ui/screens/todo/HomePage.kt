@@ -50,7 +50,8 @@ import java.time.LocalDate
 @Composable
 fun HomePage(
     openDrawer : () -> Unit,
-    closeDrawer : () -> Unit
+    closeDrawer : () -> Unit,
+    navUp : () -> Unit
 ){
     val months = listOf(0,0,0,0,1,2,3,4,5,6,7,8,9,10,11,12,0,0,0,0)
     val years = (2000..2050).toList()
@@ -77,7 +78,6 @@ fun HomePage(
             .fillMaxSize()
             .background(color = White)
     ){
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -90,18 +90,14 @@ fun HomePage(
             ){
                 TopBar(
                     title = "홈페이지",
-                    navIcon = Icons.Filled.Home,
-                    navDes = "Home Icon",
+                    navIcon = Icons.Filled.Menu,
+                    navDes = "Menu",
                     navSize = 30.dp,
-                    onNavClick = {
-
-                    },
-                    actionIcon = Icons.Filled.Menu,
-                    actionDes = "Menu",
+                    onNavClick = openDrawer,
+                    actionIcon = Icons.Filled.Home,
+                    actionDes = "Home",
                     actionSize = 30.dp,
-                    onActionClick = {
-                        
-                    }
+                    onActionClick = navUp
                 )
 
                 //년도 선택
