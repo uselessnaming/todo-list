@@ -1,13 +1,15 @@
 package com.example.todolist.ui.screens.todo
 
-import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -33,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
@@ -64,6 +67,9 @@ fun MainPage(
     val TAG = "MainPage"
     val context = LocalContext.current
 
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp
+
     //drawer 상태
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
@@ -80,8 +86,9 @@ fun MainPage(
     //로그인 여부
     val isLogin = todoViewModel.isLogin.collectAsState()
 
-    Log.d(TAG,"in MainPage")
-    Log.d(TAG,"isLogin : ${isLogin.value}")
+    //로그아웃 or 로그인 실패 메세지
+    var userMessage = "정보 오류\n다시 로그인 해주세요"
+
     if (isLogin.value){
         Box(
             modifier = Modifier
@@ -96,19 +103,25 @@ fun MainPage(
                 ModalNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
-                        ModalDrawerSheet{
-                            Spacer(Modifier.height(10.dp))
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .background(color = Transparent, shape = CircleShape),
-                                contentAlignment = Alignment.Center
-                            ){
-                                Icon(
-                                    modifier = Modifier.fillMaxSize(),
-                                    imageVector = Icons.Filled.Person,
-                                    contentDescription = "Profile Icons"
-                                )
+                        ModalDrawerSheet(
+                            modifier = Modifier.fillMaxHeight()
+                                .width(((screenWidth / 3) * 2).dp)
+                        ){
+                            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                                Spacer(Modifier.height(10.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(color = Transparent, shape = CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ){
+                                    Icon(
+                                        modifier = Modifier.fillMaxSize(),
+                                        imageVector = Icons.Filled.Person,
+                                        contentDescription = "Profile Icons"
+                                    )
+                                }
+
                             }
                             Spacer(Modifier.height(25.dp))
                             Text(
@@ -140,9 +153,20 @@ fun MainPage(
                                             selectedMenu = item
                                         }
                                     )
-
                                 }
                             }
+                            Spacer(Modifier.height(20.dp))
+//                                          로그아웃
+                            Text(
+                                modifier = Modifier.fillMaxWidth()
+                                    .clickable{
+                                        todoViewModel.logout()
+                                        userMessage = "로그아웃 성공"
+                                    },
+                                text = "로그아웃",
+                                textAlign = TextAlign.Center,
+                                fontSize = 30.sp,
+                            )
                         }
                     }
                 ) {
@@ -154,13 +178,8 @@ fun MainPage(
                                         drawerState.open()
                                     }
                                 },
-                                closeDrawer = {
-                                    coroutineScope.launch(Dispatchers.Main){
-                                        drawerState.close()
-                                    }
-                                },
                                 navUp = {
-
+                                    selectedMenu = Icons.Filled.Home
                                 }
                             )
                             Icons.Filled.Person -> MyPage()
@@ -171,7 +190,7 @@ fun MainPage(
             }
         }
     } else {
-        showToast(context, "정보 오류\n다시 로그인 해주세요")
+        showToast(context, userMessage)
         navController.navigate(Screens.LoginPage.name)
     }
 }
@@ -195,12 +214,6 @@ fun TestMainPage(){
                 }
                 composable(Screens.MainPage.name){
                     MainPage(navController)
-                }
-                composable(Screens.SettingPage.name){
-//                            SettingPage()
-                }
-                composable(Screens.MyPage.name){
-//                            MyPage()
                 }
             }
             MainPage(

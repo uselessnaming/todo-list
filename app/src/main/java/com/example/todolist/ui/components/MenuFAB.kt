@@ -111,7 +111,7 @@ fun MenuFAB(
                     scaleValues[index].animateTo(
                         targetValue = 1f,
                         animationSpec = tween(
-                            durationMillis = 300,
+                            durationMillis = 100,
                             delayMillis = index * 100
                         )
                     )
@@ -121,7 +121,7 @@ fun MenuFAB(
                     scaleValues[index].animateTo(
                         targetValue = 0f,
                         animationSpec = tween(
-                            durationMillis = 300,
+                            durationMillis = 100,
                             delayMillis = index * 100
                         )
                     )

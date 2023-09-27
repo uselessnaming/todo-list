@@ -1,5 +1,7 @@
 package com.example.todolist.ui.screens.todo
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -29,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,22 +40,29 @@ import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.todolist.Data.showToast
 import com.example.todolist.ui.components.MenuFAB
 import com.example.todolist.ui.components.Spinner
 import com.example.todolist.ui.components.TodoItem
 import com.example.todolist.ui.components.TopBar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @Composable
 fun HomePage(
     openDrawer : () -> Unit,
-    closeDrawer : () -> Unit,
     navUp : () -> Unit
 ){
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
     val months = listOf(0,0,0,0,1,2,3,4,5,6,7,8,9,10,11,12,0,0,0,0)
     val years = (2000..2050).toList()
 
@@ -73,6 +83,25 @@ fun HomePage(
     //todos
     val todos = listOf("title","title2","title3")
 
+    //뒤로가기 클릭 여부
+    var backPressed by remember{mutableStateOf(false)}
+
+    //back event
+    BackHandler {
+        //뒤로가기 두 번에 종료
+        if (backPressed){
+            (context as? Activity)?.finish()
+        } else {
+            backPressed = true
+            showToast(context,"한 번 더 누르면 앱이 종료됩니다.")
+
+            coroutineScope.launch(Dispatchers.Main){
+                delay(2000)
+                backPressed = false
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -90,14 +119,14 @@ fun HomePage(
             ){
                 TopBar(
                     title = "홈페이지",
-                    navIcon = Icons.Filled.Menu,
-                    navDes = "Menu",
+                    navIcon = Icons.Filled.Home,
+                    navDes = "Home",
                     navSize = 30.dp,
-                    onNavClick = openDrawer,
-                    actionIcon = Icons.Filled.Home,
-                    actionDes = "Home",
+                    onNavClick = navUp,
+                    actionIcon = Icons.Filled.Menu,
+                    actionDes = "Menu",
                     actionSize = 30.dp,
-                    onActionClick = navUp
+                    onActionClick = openDrawer
                 )
 
                 //년도 선택

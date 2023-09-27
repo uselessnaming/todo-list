@@ -1,6 +1,5 @@
 package com.example.todolist
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -161,8 +160,6 @@ fun LoginPage(
 
                         withContext(Dispatchers.Main){
                             if (isLogin.value){
-                                Log.d(TAG,"navController")
-                                Log.d(TAG, "isLogin : ${isLogin}")
                                 navController.navigate(Screens.MainPage.name)
                             } else {
                                 showToast(context, message)
