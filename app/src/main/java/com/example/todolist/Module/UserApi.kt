@@ -17,4 +17,8 @@ interface UserApi {
     //회원가입
     @POST("/sign-api/sign-up")
     fun signUp(@Body signUpReqDto : SignUpReqDto) : Call<SignUpRespDto>
+
+    //중복확인
+
+
 }

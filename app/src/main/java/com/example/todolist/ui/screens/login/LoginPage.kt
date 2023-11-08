@@ -1,8 +1,8 @@
 package com.example.todolist
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,18 +33,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.todolist.Data.SignInReqDto
 import com.example.todolist.Data.showToast
 import com.example.todolist.Module.TodoViewModel
 import com.example.todolist.ui.theme.MainColor
-import com.example.todolist.ui.theme.TodoListTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -65,6 +62,7 @@ fun LoginPage(
 
     //login 상태
     val isLogin = todoViewModel.isLogin.collectAsState()
+    Log.d(TAG, "isLogin : ${isLogin}")
 
     //coroutineScope
     val coroutineScope = rememberCoroutineScope()
@@ -84,35 +82,33 @@ fun LoginPage(
 
         Spacer(Modifier.weight(1f))
 
-        SelectionContainer {
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                value = id,
-                onValueChange = {
-                    id = it
-                },
-                placeholder = {
-                    Text(
-                        text = "아이디를 입력해주세요",
-                        fontSize = 20.sp,
-                        color = LightGray
-                    )
-                },
-                textStyle = TextStyle(
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth(),
+            value = id,
+            onValueChange = {
+                id = it
+            },
+            placeholder = {
+                Text(
+                    text = "아이디를 입력해주세요",
                     fontSize = 20.sp,
-                ),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    textColor = Black
-                ),
-                maxLines = 1,
-                singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Next,
-                    keyboardType = KeyboardType.Text
+                    color = LightGray
                 )
+            },
+            textStyle = TextStyle(
+                fontSize = 20.sp,
+            ),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                textColor = Black
+            ),
+            maxLines = 1,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Text
             )
-        }
+        )
 
         Spacer(Modifier.height(30.dp))
 
@@ -140,8 +136,8 @@ fun LoginPage(
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Password //>>Password가 왜 보일까?
             ),
+            visualTransformation = PasswordVisualTransformation()
         )
 
         Spacer(Modifier.height(30.dp))
@@ -160,7 +156,7 @@ fun LoginPage(
 
                         withContext(Dispatchers.Main){
                             if (isLogin.value){
-                                navController.navigate(Screens.MainPage.name)
+                                navController.navigate(Screens.HomePage.name)
                             } else {
                                 showToast(context, message)
                             }
@@ -228,19 +224,5 @@ fun LoginPage(
         }
 
         Spacer(Modifier.weight(1f))
-    }
-}
-
-@Preview
-@Composable
-fun TestLoginPage(){
-    TodoListTheme {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ){
-            LoginPage(
-                navController = rememberNavController()
-            )
-        }
     }
 }

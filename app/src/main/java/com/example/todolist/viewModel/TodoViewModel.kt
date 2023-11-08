@@ -1,7 +1,6 @@
 package com.example.todolist.Module
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todolist.Data.SignInReqDto
@@ -40,7 +39,6 @@ class TodoViewModel @Inject constructor(
     suspend fun signIn(signInReqDto : SignInReqDto) =
         viewModelScope.async(Dispatchers.IO){
             val result = repository.signIn(signInReqDto)
-            Log.d(TAG,"Error : ${result.result}")
 
             //로그인 성공 시
             if (result.result == "SUCCESS"){
@@ -57,6 +55,5 @@ class TodoViewModel @Inject constructor(
     //로그아웃
     fun logout(){
         _isLogin.value = false
-
     }
 }

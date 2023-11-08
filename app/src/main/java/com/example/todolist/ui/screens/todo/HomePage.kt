@@ -23,11 +23,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,7 +48,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.todolist.Data.showToast
+import com.example.todolist.Module.TodoViewModel
+import com.example.todolist.Screens
+import com.example.todolist.ui.components.AppDrawer
 import com.example.todolist.ui.components.MenuFAB
 import com.example.todolist.ui.components.Spinner
 import com.example.todolist.ui.components.TodoItem
@@ -55,11 +62,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePage(
-    openDrawer : () -> Unit,
-    navUp : () -> Unit
+    navController: NavController,
+    todoViewModel : TodoViewModel
 ){
+    val TAG = "HomePage"
+
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -86,6 +96,12 @@ fun HomePage(
     //뒤로가기 클릭 여부
     var backPressed by remember{mutableStateOf(false)}
 
+    //로그인 여부
+    val isLogin = todoViewModel.isLogin.collectAsState()
+
+    //drawer 상태
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+
     //back event
     BackHandler {
         //뒤로가기 두 번에 종료
@@ -102,164 +118,177 @@ fun HomePage(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = White)
-    ){
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ){
+    AppDrawer(
+        navController = navController,
+        doLogout = {
+            todoViewModel.logout()
+            showToast(context, "로그아웃")
+            navController.navigate(Screens.LoginPage.name)
+        },
+        drawerState = drawerState,
+        closeDrawer = {
+            coroutineScope.launch{
+                drawerState.close()
+            }
+        },
+        screenWidth = (configuration.screenWidthDp * 0.7).dp,
+        content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 20.dp)
+                    .background(color = White)
             ){
-                TopBar(
-                    title = "홈페이지",
-                    navIcon = Icons.Filled.Home,
-                    navDes = "Home",
-                    navSize = 30.dp,
-                    onNavClick = navUp,
-                    actionIcon = Icons.Filled.Menu,
-                    actionDes = "Menu",
-                    actionSize = 30.dp,
-                    onActionClick = openDrawer
-                )
-
-                //년도 선택
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ){
-                    Spinner(
-                        modifier = Modifier.width(100.dp),
-                        value = selectedYear,
-                        onValueChanged = {
-                            selectedYear = it
-                        },
-                        items = years
-                    )
-                }
-
-                Spacer(Modifier.height(5.dp))
-
-                //월 선택
-                Row(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                        .fillMaxSize()
+                        .weight(1f)
+                        .padding(horizontal = 20.dp)
                 ){
-                    LazyRow(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        state = monthScrollState
+                    TopBar(
+                        title = "홈페이지",
+                        navIcon = null,
+                        actionIcon = Icons.Filled.Menu,
+                        actionDes = "Menu",
+                        actionSize = 30.dp,
+                        onActionClick = {
+                            coroutineScope.launch{
+                                drawerState.open()
+                            }
+                        }
+                    )
+
+                    //년도 선택
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
                     ){
-                        items(months){
-                            val isSelected = selectedMonth == it
-                            Column(
-                                modifier = Modifier.width(40.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ){
-                                Box(
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .background(
-                                            color = if (isSelected) LightGray else Transparent,
-                                            shape = CircleShape
-                                        )
-                                        .clickable {
-                                            if (it != 0) {
-                                                selectedMonth = it
-                                            }
-                                        },
-                                    contentAlignment = Alignment.Center
+                        Spinner(
+                            modifier = Modifier.width(100.dp),
+                            value = selectedYear,
+                            onValueChanged = {
+                                selectedYear = it
+                            },
+                            items = years
+                        )
+                    }
+
+                    Spacer(Modifier.height(5.dp))
+
+                    //월 선택
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ){
+                        LazyRow(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            state = monthScrollState
+                        ){
+                            items(months){
+                                val isSelected = selectedMonth == it
+                                Column(
+                                    modifier = Modifier.width(40.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ){
-                                    if (it == 0){
-                                        Spacer(Modifier.fillMaxSize())
-                                    } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .background(
+                                                color = if (isSelected) LightGray else Transparent,
+                                                shape = CircleShape
+                                            )
+                                            .clickable {
+                                                if (it != 0) {
+                                                    selectedMonth = it
+                                                }
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ){
+                                        if (it == 0){
+                                            Spacer(Modifier.fillMaxSize())
+                                        } else {
+                                            Text(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .padding(top = 5.dp)
+                                                    .focusable(isSelected),
+                                                text = it.toString(),
+                                                fontSize = 20.sp,
+                                                color = if(isSelected) Black else LightGray,
+                                                textAlign = TextAlign.Center
+                                            )
+                                        }
+                                    }
+
+                                    if (it != 0){
+                                        //월별 투두 개수
                                         Text(
                                             modifier = Modifier
-                                                .fillMaxSize()
-                                                .padding(top = 5.dp)
-                                                .focusable(isSelected),
-                                            text = it.toString(),
-                                            fontSize = 20.sp,
-                                            color = if(isSelected) Black else LightGray,
-                                            textAlign = TextAlign.Center
+                                                .width(40.dp)
+                                                .height(20.dp),
+                                            text = "total",
+                                            fontSize = 14.sp,
+                                            textAlign = TextAlign.Center,
+                                            color = if(isSelected) Black else LightGray
                                         )
                                     }
                                 }
+                            }
+                        }
+                    }
 
-                                if (it != 0){
-                                    //월별 투두 개수
+                    Spacer(Modifier.height(10.dp))
+
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ){
+                        items(todos){
+                            //item별 click 상태
+                            var isClicked by remember{mutableStateOf(false)}
+
+                            TodoItem(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        isClicked = !isClicked
+                                    }
+                            )
+
+                            //눌렀을 떄 세부 설명
+                            if (isClicked){
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ){
                                     Text(
-                                        modifier = Modifier
-                                            .width(40.dp)
-                                            .height(20.dp),
-                                        text = "total",
+                                        modifier = Modifier.fillMaxWidth(),
+                                        text = "세부 설명",
                                         fontSize = 14.sp,
-                                        textAlign = TextAlign.Center,
-                                        color = if(isSelected) Black else LightGray
                                     )
                                 }
                             }
                         }
                     }
-                }
 
-                Spacer(Modifier.height(10.dp))
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ){
-                    items(todos){
-                        //item별 click 상태
-                        var isClicked by remember{mutableStateOf(false)}
-
-                        TodoItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    isClicked = !isClicked
-                                }
-                        )
-
-                        //눌렀을 떄 세부 설명
-                        if (isClicked){
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ){
-                                Text(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    text = "세부 설명",
-                                    fontSize = 14.sp,
-                                )
-                            }
-                        }
+                    //selectedMonth가 변결될 경우 Event
+                    LaunchedEffect(selectedMonth){
+                        monthScrollState.animateScrollToItem(months.indexOf(selectedMonth),(-screenWidthPx/2).toInt())
                     }
                 }
 
-                //selectedMonth가 변결될 경우 Event
-                LaunchedEffect(selectedMonth){
-                    monthScrollState.animateScrollToItem(months.indexOf(selectedMonth),(-screenWidthPx/2).toInt())
+                //floating action button
+                Row(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth()
+                        .padding(end = 20.dp, bottom = 20.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    MenuFAB()
                 }
             }
         }
-
-        //floating action button
-        Row(
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-                .padding(end = 20.dp, bottom = 20.dp),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            MenuFAB()
-        }
-    }
+    )
 }

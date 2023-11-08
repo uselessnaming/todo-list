@@ -5,7 +5,7 @@ enum class Screens {
     AddUserPage,
     FindIdPage,
     FindPasswdPage,
-    MainPage,
+    HomePage,
     SettingPage,
     MyPage,
 }

@@ -12,10 +12,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.todolist.ui.screens.drawerMenu.MyPage
+import com.example.todolist.ui.screens.drawerMenu.SettingPage
 import com.example.todolist.ui.screens.login.AddUserPage
 import com.example.todolist.ui.screens.login.FindIdPage
 import com.example.todolist.ui.screens.login.FindPasswdPage
-import com.example.todolist.ui.screens.todo.MainPage
+import com.example.todolist.ui.screens.todo.HomePage
 import com.example.todolist.ui.theme.TodoListTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -30,6 +32,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
+
                     NavHost(
                         navController = navController,
                         startDestination = Screens.LoginPage.name
@@ -46,20 +49,32 @@ class MainActivity : ComponentActivity() {
                         composable(Screens.LoginPage.name){
                             LoginPage(navController)
                         }
-                        composable(Screens.MainPage.name){
+                        composable(Screens.HomePage.name){
                             val parentEntry = remember(it){
                                 navController.getBackStackEntry(Screens.LoginPage.name)
                             }
-                            MainPage(
+                            HomePage(
                                 navController = navController,
                                 todoViewModel = hiltViewModel(parentEntry)
                             )
                         }
                         composable(Screens.SettingPage.name){
-//                            SettingPage()
+                            val parentEntry = remember(it){
+                                navController.getBackStackEntry(Screens.HomePage.name)
+                            }
+                            SettingPage(
+                                navController = navController,
+                                todoViewModel = hiltViewModel(parentEntry)
+                            )
                         }
                         composable(Screens.MyPage.name){
-//                            MyPage()
+                            val parentEntry = remember(it){
+                                navController.getBackStackEntry(Screens.HomePage.name)
+                            }
+                            MyPage(
+                                navController = navController,
+                                todoViewModel = hiltViewModel(parentEntry)
+                            )
                         }
                     }
                 }
