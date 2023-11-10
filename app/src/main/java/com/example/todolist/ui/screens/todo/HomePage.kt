@@ -123,7 +123,12 @@ fun HomePage(
         doLogout = {
             todoViewModel.logout()
             showToast(context, "로그아웃")
-            navController.navigate(Screens.LoginPage.name)
+            navController.navigate(Screens.LoginPage.name){
+                popUpTo(navController.graph.startDestinationId){
+                    saveState = true
+                }
+                launchSingleTop = true
+            }
         },
         drawerState = drawerState,
         closeDrawer = {
