@@ -2,7 +2,6 @@ package com.example.todolist.ui.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
@@ -30,22 +29,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.todolist.ui.theme.TodoListTheme
 
 @Composable
 fun MenuFAB(
     floatingIcon : ImageVector = Icons.Filled.Menu,
     menus : List<ImageVector> = listOf(
-        Icons.Filled.KeyboardArrowLeft,
+        Icons.Filled.AddCircle,
         Icons.Filled.KeyboardArrowRight,
         Icons.Filled.KeyboardArrowUp
-    )
+    ),
+    insertTodo : () -> Unit,
+
 ){
     var expanded by remember{mutableStateOf(false)}
+
+    val onClicks : List<() -> Unit> = listOf(
+        insertTodo,
+
+    )
 
     val scaleValues = remember{mutableStateListOf(Animatable(0f))}
     scaleValues.clear()
@@ -127,20 +130,6 @@ fun MenuFAB(
                     )
                 }
             }
-        }
-    }
-}
-
-@Preview
-@Composable
-fun TestMenuFAB(){
-    TodoListTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = White)
-        ){
-            MenuFAB()
         }
     }
 }

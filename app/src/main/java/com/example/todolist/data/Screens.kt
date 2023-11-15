@@ -5,7 +5,9 @@ enum class Screens {
     AddUserPage,
     FindIdPage,
     FindPasswdPage,
-    HomePage,
     SettingPage,
     MyPage,
+    HomePage,
+    /** Todo관련 페이지 */
+    AddTodoPage
 }

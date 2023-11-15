@@ -4,9 +4,12 @@ import com.example.todolist.Data.SignInReqDto
 import com.example.todolist.Data.SignInRespDto
 import com.example.todolist.Data.SignUpReqDto
 import com.example.todolist.Data.SignUpRespDto
+import com.example.todolist.Data.UserDto.GetUserRespDto
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface UserApi {
 
@@ -20,5 +23,8 @@ interface UserApi {
 
     //중복확인
 
+    //유저 이름 검색
+    @GET("/users/{username}")
+    fun getDataByUser(@Path("username") username : String) : Call<GetUserRespDto>
 
 }

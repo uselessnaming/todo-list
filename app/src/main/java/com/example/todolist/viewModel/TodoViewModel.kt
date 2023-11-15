@@ -1,11 +1,15 @@
-package com.example.todolist.Module
+package com.example.todolist.viewModel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todolist.Data.SignInReqDto
 import com.example.todolist.Data.SignUpReqDto
+import com.example.todolist.Data.Todo
 import com.example.todolist.Data.saveAuthToken
+import com.example.todolist.Module.TodoRepository
+import com.example.todolist.Module.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TodoViewModel @Inject constructor(
     private val repository : UserRepository,
+    private val todoRepository: TodoRepository,
     @ApplicationContext private val context : Context
 ) : ViewModel() {
     val TAG = "TodoViewModel"
@@ -25,10 +30,18 @@ class TodoViewModel @Inject constructor(
     private val _isLogin = MutableStateFlow(false)
     val isLogin : StateFlow<Boolean> = _isLogin
 
+    //로그인한 유저의 id 관리
+    private val _id = MutableStateFlow(0)
+    val id : StateFlow<Int> = _id
+
     //error msg 관리
     private val _errMsg = MutableStateFlow<String?>(null)
     val errMsg : StateFlow<String?> = _errMsg
-    
+
+    //현재 유저의 Todo List
+    private val _todos = MutableStateFlow(listOf<Todo>())
+    val todos : StateFlow<List<Todo>> = _todos
+
     suspend fun signUp(signUpReqDto : SignUpReqDto) =
         viewModelScope.async(Dispatchers.IO){
             val result = repository.signUp(signUpReqDto)
@@ -44,6 +57,8 @@ class TodoViewModel @Inject constructor(
             if (result.result == "SUCCESS"){
                 _isLogin.value = true
                 saveAuthToken(context, result.token)
+                //userId의 값을 설정 _id.value = 0
+                Log.d(TAG, "Token : ${result.token}")
             }
             //로그인 실패 시
             else {
@@ -55,5 +70,19 @@ class TodoViewModel @Inject constructor(
     //로그아웃
     fun logout(){
         _isLogin.value = false
+        _id.value = 0
     }
+
+    //userId를 통해 todo 받아오기
+    suspend fun getTodos(userId : Int) =
+        viewModelScope.async(Dispatchers.IO){
+            val result = todoRepository.getData(userId)
+            var message = "success"
+            if (result.commonResponse == "SUCCESS"){
+                _todos.value = result.data
+            } else {
+                message = "failed"
+            }
+            return@async message
+        }.await()
 }

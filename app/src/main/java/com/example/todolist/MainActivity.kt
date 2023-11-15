@@ -17,6 +17,7 @@ import com.example.todolist.ui.screens.drawerMenu.SettingPage
 import com.example.todolist.ui.screens.login.AddUserPage
 import com.example.todolist.ui.screens.login.FindIdPage
 import com.example.todolist.ui.screens.login.FindPasswdPage
+import com.example.todolist.ui.screens.todo.AddTodoPage
 import com.example.todolist.ui.screens.todo.HomePage
 import com.example.todolist.ui.theme.TodoListTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -72,6 +73,15 @@ class MainActivity : ComponentActivity() {
                                 navController.getBackStackEntry(Screens.HomePage.name)
                             }
                             MyPage(
+                                navController = navController,
+                                todoViewModel = hiltViewModel(parentEntry)
+                            )
+                        }
+                        composable(Screens.AddTodoPage.name){
+                            val parentEntry = remember(it){
+                                navController.getBackStackEntry(Screens.HomePage.name)
+                            }
+                            AddTodoPage(
                                 navController = navController,
                                 todoViewModel = hiltViewModel(parentEntry)
                             )

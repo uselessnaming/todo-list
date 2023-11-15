@@ -30,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,13 +49,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.todolist.Data.showToast
-import com.example.todolist.Module.TodoViewModel
 import com.example.todolist.Screens
 import com.example.todolist.ui.components.AppDrawer
 import com.example.todolist.ui.components.MenuFAB
 import com.example.todolist.ui.components.Spinner
 import com.example.todolist.ui.components.TodoItem
 import com.example.todolist.ui.components.TopBar
+import com.example.todolist.viewModel.TodoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -95,9 +94,6 @@ fun HomePage(
 
     //뒤로가기 클릭 여부
     var backPressed by remember{mutableStateOf(false)}
-
-    //로그인 여부
-    val isLogin = todoViewModel.isLogin.collectAsState()
 
     //drawer 상태
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -291,7 +287,11 @@ fun HomePage(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ){
-                    MenuFAB()
+                    MenuFAB(
+                        insertTodo = {
+                            navController.navigate(Screens.AddTodoPage.name)
+                        }
+                    )
                 }
             }
         }

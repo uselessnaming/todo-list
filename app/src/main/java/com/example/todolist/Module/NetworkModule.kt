@@ -28,4 +28,10 @@ object NetworkModule {
     fun provideUserApi(retrofit : Retrofit) : UserApi{
         return retrofit.create(UserApi::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideTodoApi(retrofit: Retrofit) : TodoApi{
+        return retrofit.create(TodoApi::class.java)
+    }
 }
