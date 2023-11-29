@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.todolist.Data.SignUpReqDto
 import com.example.todolist.Data.showToast
 import com.example.todolist.Screens
 import com.example.todolist.ui.theme.MainColor

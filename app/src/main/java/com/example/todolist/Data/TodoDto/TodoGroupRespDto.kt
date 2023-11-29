@@ -1,11 +1,12 @@
 package com.example.todolist.Data.TodoDto
 
-import com.example.todolist.Data.Todo
 import com.google.gson.annotations.SerializedName
 
-data class TodoResponseBody(
+data class TodoGroupRespDto(
     @SerializedName("commonResponse")
-    val commonResponse: String,
+    val commonResponse : String,
     @SerializedName("data")
-    val data: List<Todo>
+    val data : String?,
+    @SerializedName("message")
+    val message : String
 )

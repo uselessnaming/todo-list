@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.todolist.Data.SignInReqDto
 import com.example.todolist.Data.showToast
 import com.example.todolist.ui.theme.MainColor
 import com.example.todolist.viewModel.TodoViewModel
@@ -100,7 +99,8 @@ fun LoginPage(
                 fontSize = 20.sp,
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                textColor = Black
+                focusedTextColor = Black,
+                unfocusedTextColor = Black
             ),
             maxLines = 1,
             singleLine = true,
@@ -130,7 +130,8 @@ fun LoginPage(
                 fontSize = 20.sp,
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                textColor = Black
+                focusedTextColor = Black,
+                unfocusedTextColor = Black
             ),
             maxLines = 1,
             singleLine = true,

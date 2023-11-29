@@ -1,13 +1,12 @@
-package com.example.todolist.Data
+package com.example.todolist.Data.TodoDto
 
-import com.example.todolist.Data.LoginDto.User
 import com.google.gson.annotations.SerializedName
 
-data class SignUpRespDto(
+data class TodoRespDto(
     @SerializedName("commonResponse")
-    val result : String,
+    val commonResponse : String,
     @SerializedName("data")
-    val data : User,
+    val data : String?,
     @SerializedName("message")
     val message : String
 )

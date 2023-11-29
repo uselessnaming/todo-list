@@ -1,13 +1,10 @@
 package com.example.todolist.viewModel
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.todolist.Data.SignInReqDto
-import com.example.todolist.Data.SignUpReqDto
+import com.example.todolist.Data.LoginDto.User
 import com.example.todolist.Data.Todo
-import com.example.todolist.Data.saveAuthToken
 import com.example.todolist.Module.TodoRepository
 import com.example.todolist.Module.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,30 +39,30 @@ class TodoViewModel @Inject constructor(
     private val _todos = MutableStateFlow(listOf<Todo>())
     val todos : StateFlow<List<Todo>> = _todos
 
-    suspend fun signUp(signUpReqDto : SignUpReqDto) =
+    suspend fun signUp(signUpReqDto : User) =
         viewModelScope.async(Dispatchers.IO){
             val result = repository.signUp(signUpReqDto)
 
             return@async result.result
         }.await()
 
-    suspend fun signIn(signInReqDto : SignInReqDto) =
-        viewModelScope.async(Dispatchers.IO){
-            val result = repository.signIn(signInReqDto)
-
-            //로그인 성공 시
-            if (result.result == "SUCCESS"){
-                _isLogin.value = true
-                saveAuthToken(context, result.token)
-                //userId의 값을 설정 _id.value = 0
-                Log.d(TAG, "Token : ${result.token}")
-            }
-            //로그인 실패 시
-            else {
-                _isLogin.value = false
-            }
-            return@async result.result
-        }.await()
+//    suspend fun signIn(signInReqDto : SignInReqDto) =
+//        viewModelScope.async(Dispatchers.IO){
+//            val result = repository.signIn(signInReqDto)
+//
+//            //로그인 성공 시
+//            if (result.result == "SUCCESS"){
+//                _isLogin.value = true
+//                saveAuthToken(context, result.token)
+//                //userId의 값을 설정 _id.value = 0
+//                Log.d(TAG, "Token : ${result.token}")
+//            }
+//            //로그인 실패 시
+//            else {
+//                _isLogin.value = false
+//            }
+//            return@async result.result
+//        }.await()
 
     //로그아웃
     fun logout(){

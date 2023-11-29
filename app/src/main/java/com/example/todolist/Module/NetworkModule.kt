@@ -12,13 +12,13 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val USER_URL = "http://ec2-3-36-184-17.ap-northeast-2.compute.amazonaws.com:8080"
+    private const val BASE_URL = "http://jeonga.na2ru2.me"
 
     @Provides
     @Singleton
     fun provideRetrofit() : Retrofit{
         return Retrofit.Builder()
-            .baseUrl(USER_URL)
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

@@ -1,6 +1,5 @@
 package com.example.todolist.Module
 
-import com.example.todolist.Data.TodoDto.TodoResponseBody
 import javax.inject.Inject
 
 class TodoRepository @Inject constructor(

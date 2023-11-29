@@ -5,12 +5,18 @@ import com.google.gson.annotations.SerializedName
 data class Todo(
     @SerializedName("startDate")
     val startDate : String,
-    @SerializedName("deadDate")
+    @SerializedName("endDate")
     val deadDate : String,
     @SerializedName("isFinished")
     val isFinished : Boolean,
+    @SerializedName("todoDescription")
+    val description : String,
+    @SerializedName("todoGroupNum")
+    val isImportant : Int,
+    @SerializedName("todoLocation")
+    val location : String,
     @SerializedName("todoTitle")
     val title : String,
-    @SerializedName("isImportant")
-    val isImportant : Boolean
+    @SerializedName("todoNum")
+    val todoNum : Int
 )
