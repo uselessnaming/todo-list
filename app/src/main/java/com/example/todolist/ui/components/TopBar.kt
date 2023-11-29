@@ -1,6 +1,7 @@
 package com.example.todolist.ui.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -28,12 +29,12 @@ import com.example.todolist.ui.theme.TodoListTheme
 fun TopBar(
     title : String,
     navIcon : ImageVector?,
-    navDes : String? = null,
-    navSize : Dp? = null,
+    navDes : String = "Navigation",
+    navSize : Dp = 30.dp,
     onNavClick : () -> Unit = {},
-    actionIcon : ImageVector,
-    actionDes : String,
-    actionSize : Dp,
+    actionIcon : ImageVector?,
+    actionDes : String = "Action",
+    actionSize : Dp = 30.dp,
     onActionClick : () -> Unit,
 ){
     TopAppBar(
@@ -50,7 +51,7 @@ fun TopBar(
         navigationIcon = {
             if (navIcon != null){
                 IconButton(
-                    modifier = Modifier.size(navSize!!),
+                    modifier = Modifier.size(navSize),
                     onClick = onNavClick
                 ) {
                     Icon(
@@ -60,17 +61,25 @@ fun TopBar(
                     )
                 }
             }
+            else {
+                Spacer(Modifier.size(navSize))
+            }
         },
         actions = {
-            IconButton(
-                modifier = Modifier.size(actionSize),
-                onClick = onActionClick
-            ) {
-                Icon(
-                    modifier = Modifier.fillMaxSize(),
-                    imageVector = actionIcon,
-                    contentDescription = actionDes
-                )
+            if (actionIcon != null){
+                IconButton(
+                    modifier = Modifier.size(actionSize),
+                    onClick = onActionClick
+                ) {
+                    Icon(
+                        modifier = Modifier.fillMaxSize(),
+                        imageVector = actionIcon,
+                        contentDescription = actionDes
+                    )
+                }
+            }
+            else {
+                Spacer(Modifier.size(actionSize))
             }
         }
     )

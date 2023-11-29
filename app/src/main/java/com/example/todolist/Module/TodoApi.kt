@@ -4,6 +4,7 @@ import com.example.todolist.Data.TodoDto.DelTodoRespDto
 import com.example.todolist.Data.TodoDto.GetTodoGroupsRespDto
 import com.example.todolist.Data.TodoDto.TodoGroupReqDto
 import com.example.todolist.Data.TodoDto.TodoGroupRespDto
+import com.example.todolist.Data.TodoDto.TodoGroupsRespDto
 import com.example.todolist.Data.TodoDto.TodoReqDto
 import com.example.todolist.Data.TodoDto.TodoRespDto
 import com.example.todolist.Data.TodoDto.TodosRespDto
@@ -59,6 +60,6 @@ interface TodoApi {
 
     //Todo 그룹을 가지고 있는 Todo 전체 조회
     @GET("/todogroup/todolist/{clientnum}")
-    fun getAllTodosInGroup(@Path("clientnum") clientNum : Int) :
+    fun getAllTodosInGroup(@Path("clientnum") clientNum : Int) : Call<TodoGroupsRespDto>
 
 }

@@ -47,7 +47,8 @@ fun MenuFAB(
 
     val onClicks : List<() -> Unit> = listOf(
         insertTodo,
-
+        {},
+        {}
     )
 
     val scaleValues = remember{mutableStateListOf(Animatable(0f))}
@@ -82,6 +83,7 @@ fun MenuFAB(
                         IconButton(
                             modifier = Modifier.size(40.dp) then scaleModifier,
                             onClick = {
+                                onClicks[index]()
                             }
                         ) {
                             Icon(

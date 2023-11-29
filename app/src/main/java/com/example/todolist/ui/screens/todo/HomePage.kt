@@ -33,7 +33,6 @@ import com.example.todolist.viewModel.TodoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 @Composable
 fun HomePage(
@@ -57,12 +56,6 @@ fun HomePage(
 
     //drawer 상태
     val isMenuClicked = remember{mutableStateOf(false)}
-
-    //Calendar 객체
-    val calendar = Calendar.getInstance()
-
-    //year
-    var year by remember{mutableStateOf(calendar.get(Calendar.YEAR))}
 
     //back event
     BackHandler {

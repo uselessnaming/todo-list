@@ -39,14 +39,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.todolist.Data.showToast
-import com.example.todolist.Screens
 import com.example.todolist.ui.theme.MainColor
 import com.example.todolist.ui.theme.SubColor1
 import com.example.todolist.ui.theme.TodoListTheme
 import com.example.todolist.viewModel.TodoViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -289,32 +285,26 @@ fun AddUserPage(
                     containerColor = MainColor
                 ),
                 onClick = {
-                    val newUser = SignUpReqDto(
-                        password = newPasswd,
-                        role = arrayListOf("ROLE_USER"),
-                        email = newEmail,
-                        userName = newId
-                    )
-                    //newUser를 서버에 추가
-                    coroutine.launch(Dispatchers.IO){
-                        val resultMsg = todoViewModel.signUp(newUser)
-                        withContext(Dispatchers.Main){
-                            //성공할 경우
-                            if (resultMsg == "SUCCESS"){
-                                showToast(context, "회원 가입 성공")
-                                resetData()
-                                navController.navigate(Screens.LoginPage.name)
-                            }
-                            //중복일 경우
-                            else if (resultMsg == "Duplicate"){
-                                showToast(context, "동일한 아이디가 있습니다.")
-                            }
-                            //그 외 실패
-                            else {
-                                showToast(context, resultMsg)
-                            }
-                        }
-                    }
+//                    //newUser를 서버에 추가
+//                    coroutine.launch(Dispatchers.IO){
+//                        val resultMsg = todoViewModel.signUp(newUser)
+//                        withContext(Dispatchers.Main){
+//                            //성공할 경우
+//                            if (resultMsg == "SUCCESS"){
+//                                showToast(context, "회원 가입 성공")
+//                                resetData()
+//                                navController.navigate(Screens.LoginPage.name)
+//                            }
+//                            //중복일 경우
+//                            else if (resultMsg == "Duplicate"){
+//                                showToast(context, "동일한 아이디가 있습니다.")
+//                            }
+//                            //그 외 실패
+//                            else {
+//                                showToast(context, resultMsg)
+//                            }
+//                        }
+//                    }
                 }
             ) {
                 Text(

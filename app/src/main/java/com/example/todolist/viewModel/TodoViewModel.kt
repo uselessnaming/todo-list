@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todolist.Data.LoginDto.User
 import com.example.todolist.Data.Todo
+import com.example.todolist.Module.MyCalendar
 import com.example.todolist.Module.TodoRepository
 import com.example.todolist.Module.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,9 @@ class TodoViewModel @Inject constructor(
     @ApplicationContext private val context : Context
 ) : ViewModel() {
     val TAG = "TodoViewModel"
+
+    //달력 모듈
+    val calendar = MyCalendar()
 
     //로그인 상태 유지
     private val _isLogin = MutableStateFlow(false)
@@ -70,16 +74,5 @@ class TodoViewModel @Inject constructor(
         _id.value = 0
     }
 
-    //userId를 통해 todo 받아오기
-    suspend fun getTodos(userId : Int) =
-        viewModelScope.async(Dispatchers.IO){
-            val result = todoRepository.getData(userId)
-            var message = "success"
-            if (result.commonResponse == "SUCCESS"){
-                _todos.value = result.data
-            } else {
-                message = "failed"
-            }
-            return@async message
-        }.await()
+    fun getToday() = calendar.getToday()
 }

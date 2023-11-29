@@ -42,9 +42,6 @@ import androidx.navigation.NavController
 import com.example.todolist.Data.showToast
 import com.example.todolist.ui.theme.MainColor
 import com.example.todolist.viewModel.TodoViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -148,21 +145,7 @@ fun LoginPage(
             onClick = {
                 //id와 passwd가 있을 경우
                 if(id.isNotEmpty() && passwd.isNotEmpty()){
-                    val loginReqDto = SignInReqDto(
-                        password = passwd,
-                        id = id
-                    )
-                    coroutineScope.launch{
-                        val message = todoViewModel.signIn(loginReqDto)
-
-                        withContext(Dispatchers.Main){
-                            if (isLogin.value){
-                                navController.navigate(Screens.HomePage.name)
-                            } else {
-                                showToast(context, message)
-                            }
-                        }
-                    }
+                    /** 로그인 로직 */
                 }
                 //id와 passwd가 없을 경우
                 else {
@@ -205,7 +188,8 @@ fun LoginPage(
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-
+                        //임시 홈페이지 이동
+                        navController.navigate(Screens.HomePage.name)
                     },
                 text = "아이디 찾기",
                 color = LightGray,

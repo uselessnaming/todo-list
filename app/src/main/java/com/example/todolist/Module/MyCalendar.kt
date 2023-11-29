@@ -1,6 +1,7 @@
 package com.example.todolist.Module
 
 import com.example.todolist.Data.Calendar.Date
+import java.text.SimpleDateFormat
 import java.util.Calendar
 
 class MyCalendar {
@@ -90,5 +91,27 @@ class MyCalendar {
             val diff = i - day_of_week
             dayList.add(calDate(selectedDate, diff))
         }
+    }
+
+    //오늘 날짜를 받는 함수
+    //List[0] = 날짜 / List[2] = 시간 / List[3] = 분
+    fun getToday() : List<String>{
+        val returnList = mutableListOf<String>()
+
+        //날짜 출력 format
+        val dateFormat = SimpleDateFormat("yyyy. MM. dd")
+        returnList.add(dateFormat.format(today))
+
+        val calendarTime = calendar.time
+
+        //시간 출력 format
+        val timeFormat = SimpleDateFormat("HH")
+        returnList.add(timeFormat.format(calendarTime))
+
+        //분 출력 format
+        val minuteFormat = SimpleDateFormat("mm")
+        returnList.add(minuteFormat.format(calendarTime))
+
+        return returnList
     }
 }
