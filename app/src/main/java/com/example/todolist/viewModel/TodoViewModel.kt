@@ -1,8 +1,10 @@
 package com.example.todolist.viewModel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.todolist.Data.DataClass.TodoGroupInTodo
 import com.example.todolist.Data.LoginDto.User
 import com.example.todolist.Data.Todo
 import com.example.todolist.Module.MyCalendar
@@ -14,6 +16,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,11 +33,13 @@ class TodoViewModel @Inject constructor(
 
     //로그인 상태 유지
     private val _isLogin = MutableStateFlow(false)
-    val isLogin : StateFlow<Boolean> = _isLogin
+    val isLogin : StateFlow<Boolean>
+        get() = _isLogin
 
     //로그인한 유저의 id 관리
     private val _id = MutableStateFlow(0)
-    val id : StateFlow<Int> = _id
+    val id : StateFlow<Int>
+        get() = _id
 
     //error msg 관리
     private val _errMsg = MutableStateFlow<String?>(null)
@@ -41,7 +47,13 @@ class TodoViewModel @Inject constructor(
 
     //현재 유저의 Todo List
     private val _todos = MutableStateFlow(listOf<Todo>())
-    val todos : StateFlow<List<Todo>> = _todos
+    val todos : StateFlow<List<Todo>>
+        get() = _todos
+
+    //현재 유저의 Todo Group List
+    private val _todoGroups = MutableStateFlow(listOf<TodoGroupInTodo>())
+    val todoGroups : StateFlow<List<TodoGroupInTodo>>
+        get() = _todoGroups
 
     suspend fun signUp(signUpReqDto : User) =
         viewModelScope.async(Dispatchers.IO){
@@ -50,24 +62,6 @@ class TodoViewModel @Inject constructor(
             return@async result.result
         }.await()
 
-//    suspend fun signIn(signInReqDto : SignInReqDto) =
-//        viewModelScope.async(Dispatchers.IO){
-//            val result = repository.signIn(signInReqDto)
-//
-//            //로그인 성공 시
-//            if (result.result == "SUCCESS"){
-//                _isLogin.value = true
-//                saveAuthToken(context, result.token)
-//                //userId의 값을 설정 _id.value = 0
-//                Log.d(TAG, "Token : ${result.token}")
-//            }
-//            //로그인 실패 시
-//            else {
-//                _isLogin.value = false
-//            }
-//            return@async result.result
-//        }.await()
-
     //로그아웃
     fun logout(){
         _isLogin.value = false
@@ -75,4 +69,38 @@ class TodoViewModel @Inject constructor(
     }
 
     fun getToday() = calendar.getToday()
+
+    //로그인 기능 x 테스트 용
+    fun setClientNum(id : Int){
+        runBlocking{
+            viewModelScope.launch(Dispatchers.IO){
+                _id.value = id
+                _todoGroups.tryEmit(todoRepository.getGroups(id))
+                Log.d(TAG, "_todosGroups : ${_todoGroups.value}")
+
+
+                val tmpList = arrayListOf<Todo>()
+                todoGroups.value.forEach{
+                    tmpList.addAll(it.todoList)
+                }
+
+                _todos.tryEmit(tmpList)
+            }
+        }
+    }
+
+    //id를 통해서 Todo 객체 가져오기
+    fun getTodoById(id : String) : Todo {
+
+        var result : Todo? = null
+
+        Log.d(TAG, "todos : ${todos.value}")
+        todos.value.forEach{
+            if (id.toInt() == it.todoNum){
+                result = it
+                return@forEach
+            }
+        }
+        return result ?: throw NullPointerException("Error : Todo is NULL in getTodo() / ${TAG}")
+    }
 }

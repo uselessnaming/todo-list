@@ -1,6 +1,7 @@
 package com.example.todolist
 
 enum class Screens {
+    /** User 관련 페이지 */
     LoginPage,
     AddUserPage,
     FindIdPage,
@@ -8,6 +9,7 @@ enum class Screens {
     SettingPage,
     MyPage,
     HomePage,
-    /** Todo관련 페이지 */
-    AddTodoPage
+    /** Todo 관련 페이지 */
+    AddTodoPage,
+    DescriptionPage
 }

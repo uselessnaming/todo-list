@@ -14,5 +14,5 @@ data class User(
     @SerializedName("clientPhoneNum")
     val clientPhoneNum: String,
     @SerializedName("clientRole")
-    val clientRole: String = "ROLE_USER"
+    val clientRole: List<String> = listOf("ROLE_USER")
 )

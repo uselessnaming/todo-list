@@ -3,6 +3,7 @@ package com.example.todolist.ui.screens.todo
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,10 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,10 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.todolist.Data.showToast
 import com.example.todolist.Screens
 import com.example.todolist.ui.components.MenuFAB
+import com.example.todolist.ui.components.TodoGroupItem
 import com.example.todolist.ui.components.TopBar
 import com.example.todolist.viewModel.TodoViewModel
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +43,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomePage(
     navController: NavController,
-    todoViewModel : TodoViewModel
+    todoViewModel : TodoViewModel = hiltViewModel()
 ){
     val TAG = "HomePage"
 
@@ -49,13 +55,15 @@ fun HomePage(
     val screenWidth = configuration.screenWidthDp.dp
 
     //todos
-    val todos = listOf("title","title2","title3")
+    val todos = todoViewModel.todoGroups.collectAsState()
 
     //뒤로가기 클릭 여부
     var backPressed by remember{mutableStateOf(false)}
 
     //drawer 상태
     val isMenuClicked = remember{mutableStateOf(false)}
+
+    val scrollState = rememberScrollState()
 
     //back event
     BackHandler {
@@ -73,13 +81,12 @@ fun HomePage(
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier.fillMaxSize()
     ){
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f)
                 .padding(horizontal = 20.dp)
         ){
             TopBar(
@@ -99,18 +106,28 @@ fun HomePage(
                 modifier = Modifier.fillMaxWidth()
             ){
                 /** 날짜를 선택할 수 있는 Spinner */
+//                Spinner(value = , onValueChanged = , items = )
 
                 /** /날짜/ + /</ + />/ */
+            }
+
+            /** 날짜에 맞는 TodoList */
+            LazyColumn{
+                items(todos.value){group ->
+                    TodoGroupItem(
+                        todos = group.todoList,
+                        navController = navController,
+                    )
+                }
             }
         }
         //floating action button
         Row(
             modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(end = 20.dp, bottom = 20.dp),
             horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Bottom
         ){
             MenuFAB(
                 insertTodo = {
@@ -119,36 +136,4 @@ fun HomePage(
             )
         }
     }
-
-
-    /* App Drawer 사용 x / 
-    AppDrawer(
-        navController = navController,
-        doLogout = {
-            todoViewModel.logout()
-            showToast(context, "로그아웃")
-            navController.navigate(Screens.LoginPage.name){
-                popUpTo(navController.graph.startDestinationId){
-                    saveState = true
-                }
-                launchSingleTop = true
-            }
-        },
-        drawerState = drawerState,
-        closeDrawer = {
-            coroutineScope.launch{
-                drawerState.close()
-            }
-        },
-        screenWidth = (configuration.screenWidthDp * 0.7).dp,
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = White)
-            ){
-                //여기 내용을 밖으로 꺼내서 사용 혹시 필요하면 다시 안으로 넣어서 사용
-            }
-        }
-    )*/
 }

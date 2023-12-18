@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Create
@@ -27,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +51,9 @@ fun AddTodoPage(
     var title by remember{mutableStateOf("")}
     var loc by remember{mutableStateOf("")}
 
+    val today = todoViewModel.getToday()
+    val today_date = today[0]
+
     var selectedStartHour by remember{mutableStateOf(todoViewModel.calendar.getToday()[1].toInt())}
     var selectedStartMinutes by remember{mutableStateOf(todoViewModel.calendar.getToday()[2].toInt())}
     var selectedStartAmPm by remember{mutableStateOf(if (selectedStartHour > 12) "오후" else "오전")}
@@ -55,8 +62,15 @@ fun AddTodoPage(
     var selectedEndMinutes by remember{mutableStateOf(todoViewModel.calendar.getToday()[2].toInt())}
     var selectedEndAmPm by remember{mutableStateOf(if (selectedEndHour > 12) "오후" else "오전")}
 
+    val scrollState = rememberScrollState()
+
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val screenHeight = configuration.screenHeightDp.dp
+
     Column(
         modifier = Modifier.fillMaxSize()
+            .verticalScroll(scrollState)
     ){
         //TopBar
         TopBar(
@@ -78,12 +92,11 @@ fun AddTodoPage(
 
             Spacer(Modifier.height(15.dp))
 
-
             //todo title 입력
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .height(55.dp)
             ){
                 Column(
                     modifier = Modifier.weight(1f),
@@ -121,7 +134,7 @@ fun AddTodoPage(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(3f)
+                    .height(screenWidth / 3)
             ){
                 Column(
                     modifier = Modifier.weight(1f),
@@ -158,7 +171,7 @@ fun AddTodoPage(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .height(55.dp)
             ){
                 Column(
                     modifier = Modifier.weight(1f),
@@ -196,7 +209,7 @@ fun AddTodoPage(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(2f)
+                    .height(80.dp)
             ){
                 Column(
                     modifier = Modifier.weight(1f),
@@ -208,23 +221,25 @@ fun AddTodoPage(
                         contentDescription = "Title"
                     )
                 }
-                Column(
+                Row(
                     modifier = Modifier.weight(5f)
                 ){
                     //startDate 입력
-                    Row(
+                    Column(
                         modifier = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalArrangement = Arrangement.Center
                     ){
                         //날짜 선택
                         CustomDatePicker(
-                            modifier = Modifier.weight(3f),
-                            date = "2023. 11. 29" //viewmodel에서 오늘 날짜를 기본으로 설정
+                            modifier = Modifier,
+                            date = today_date //viewmodel에서 오늘 날짜를 기본으로 설정
                         )
+
+                        Spacer(Modifier.height(10.dp))
 
                         //시간 선택
                         CustomTimePicker(
-                            modifier = Modifier.weight(2f),
+                            modifier = Modifier.height(120.dp),
                             hour = selectedStartHour,
                             minute = selectedStartMinutes,
                             onUpdateDate = {
@@ -234,21 +249,25 @@ fun AddTodoPage(
                             }
                         )
                     }
-                    
+
+                    Spacer(Modifier.width(5.dp))
+
                     //endDate 입력
-                    Row(
+                    Column(
                         modifier = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalArrangement = Arrangement.Center
                     ){
                         //날짜 선택
                         CustomDatePicker(
-                            modifier = Modifier.weight(3f),
-                            date = "2023. 11. 29"
+                            modifier = Modifier,
+                            date = today_date
                         )
-                        
+
+                        Spacer(Modifier.height(10.dp))
+
                         //시간 선택
                         CustomTimePicker(
-                            modifier = Modifier.weight(2f),
+                            modifier = Modifier.height(120.dp),
                             hour = selectedEndHour,
                             minute = selectedEndMinutes,
                             onUpdateDate = {
@@ -273,11 +292,10 @@ fun TestAddTodoPage(){
                 .fillMaxSize()
                 .background(color = Color.White)
         ){
-
+            AddTodoPage(
+                navController = rememberNavController(),
+                todoViewModel = hiltViewModel()
+            )
         }
-        AddTodoPage(
-            navController = rememberNavController(),
-            todoViewModel = hiltViewModel()
-        )
     }
 }

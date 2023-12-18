@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun CustomTimePicker(
@@ -36,9 +38,14 @@ fun CustomTimePicker(
     var selectedHour by remember{mutableStateOf(new_hour)}
     var selectedMinutes by remember{mutableStateOf(new_minute)}
 
+    val hourFormatter = DateTimeFormatter.ofPattern("HH")
+    val minuteFormatter = DateTimeFormatter.ofPattern("MM")
+    val amPmFormatter = DateTimeFormatter.ofPattern("a")
+
 
     /** SPinner Component를 생성해 이용 */
     Row(
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ){
         Text(
@@ -49,26 +56,40 @@ fun CustomTimePicker(
             text = am_pm,
         )
         Spinner(
-            modifier = Modifier.weight(1f),
-            value = hour.toInt(),
+            modifier = Modifier,
+            value = selectedHour,
             onValueChanged = {
                 selectedHour = it
                 onUpdateDate(Triple(selectedHour, selectedMinutes, am_pm))
             },
-            items = hours
+            items = hours,
+            onUseFetch = true,
+            onFetchTime = {
+                val current = LocalDateTime.now()
+                selectedHour = current.format(hourFormatter).toInt()
+                selectedMinutes = current.format(minuteFormatter).toInt()
+                am_pm = current.format(amPmFormatter)
+            }
         )
         Text(
             fontSize = 30.sp,
             text = ":",
         )
         Spinner(
-            modifier = Modifier.weight(1f),
-            value = minute.toInt(),
+            modifier = Modifier,
+            value = selectedMinutes,
             onValueChanged = {
                 selectedMinutes = it
                 onUpdateDate(Triple(selectedHour, selectedMinutes, am_pm))
             },
-            items = minutes
+            items = minutes,
+            onUseFetch = true,
+            onFetchTime = {
+                val current = LocalDateTime.now()
+                selectedHour = current.format(hourFormatter).toInt()
+                selectedMinutes = current.format(minuteFormatter).toInt()
+                am_pm = current.format(amPmFormatter)
+            }
         )
     }
 }
@@ -85,7 +106,7 @@ fun TestTimePicker(){
             modifier = Modifier,
             hour = 5,
             minute = 10,
-            onUpdateDate = {}
+            onUpdateDate = {},
         )
     }
 }

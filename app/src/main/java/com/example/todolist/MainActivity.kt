@@ -18,6 +18,7 @@ import com.example.todolist.ui.screens.login.AddUserPage
 import com.example.todolist.ui.screens.login.FindIdPage
 import com.example.todolist.ui.screens.login.FindPasswdPage
 import com.example.todolist.ui.screens.todo.AddTodoPage
+import com.example.todolist.ui.screens.todo.DescriptionPage
 import com.example.todolist.ui.screens.todo.HomePage
 import com.example.todolist.ui.theme.TodoListTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,7 +62,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Screens.SettingPage.name){
                             val parentEntry = remember(it){
-                                navController.getBackStackEntry(Screens.HomePage.name)
+                                navController.getBackStackEntry(Screens.LoginPage.name)
                             }
                             SettingPage(
                                 navController = navController,
@@ -70,7 +71,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Screens.MyPage.name){
                             val parentEntry = remember(it){
-                                navController.getBackStackEntry(Screens.HomePage.name)
+                                navController.getBackStackEntry(Screens.LoginPage.name)
                             }
                             MyPage(
                                 navController = navController,
@@ -79,11 +80,21 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Screens.AddTodoPage.name){
                             val parentEntry = remember(it){
-                                navController.getBackStackEntry(Screens.HomePage.name)
+                                navController.getBackStackEntry(Screens.LoginPage.name)
                             }
                             AddTodoPage(
                                 navController = navController,
                                 todoViewModel = hiltViewModel(parentEntry)
+                            )
+                        }
+                        composable("${Screens.DescriptionPage.name}/{id}"){
+                            val parentEntry = remember(it){
+                                navController.getBackStackEntry(Screens.LoginPage.name)
+                            }
+                            DescriptionPage(
+                                navController = navController,
+                                todoViewModel = hiltViewModel(parentEntry),
+                                id = it.arguments?.getString("id") ?: throw NullPointerException("Id is NULL")
                             )
                         }
                     }

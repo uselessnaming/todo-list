@@ -12,7 +12,7 @@ data class Todo(
     @SerializedName("todoDescription")
     val description : String,
     @SerializedName("todoGroupNum")
-    val isImportant : Int,
+    var groupNum : Int,
     @SerializedName("todoLocation")
     val location : String,
     @SerializedName("todoTitle")

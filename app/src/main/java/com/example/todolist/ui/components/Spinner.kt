@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,6 +42,8 @@ fun Spinner(
     value : Int,
     onValueChanged : (Int) -> Unit,
     items : List<Int>,
+    onUseFetch : Boolean = false,
+    onFetchTime : () -> Unit = {},
 ){
     //lazy scroll state 저장 정보
     val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = items.indexOf(value))
@@ -63,8 +66,10 @@ fun Spinner(
         verticalAlignment = Alignment.CenterVertically
     ){
         Text(
-            modifier = Modifier.weight(1f)
-                .clickable{
+            modifier = Modifier.clickable{
+                    if (onUseFetch){
+                        onFetchTime()
+                    }
                     onDropdownMenu()
                 },
             text = "${value}",
@@ -74,6 +79,7 @@ fun Spinner(
         )
 
         DropdownMenu(
+            modifier = Modifier,
             expanded = isExpanded,
             onDismissRequest = onDropdownMenu,
         ) {
@@ -114,8 +120,7 @@ fun TestSpinner(){
     TodoListTheme {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
+                .fillMaxSize()
                 .background(color = White),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
@@ -129,6 +134,7 @@ fun TestSpinner(){
                     year = it
                 },
                 items = items,
+                onFetchTime = {}
             )
         }
     }

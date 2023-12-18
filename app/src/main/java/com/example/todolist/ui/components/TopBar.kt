@@ -35,7 +35,7 @@ fun TopBar(
     actionIcon : ImageVector?,
     actionDes : String = "Action",
     actionSize : Dp = 30.dp,
-    onActionClick : () -> Unit,
+    onActionClick : () -> Unit = {},
 ){
     TopAppBar(
         modifier = Modifier.fillMaxWidth(),
