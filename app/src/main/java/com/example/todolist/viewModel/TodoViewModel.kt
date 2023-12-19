@@ -31,6 +31,10 @@ class TodoViewModel @Inject constructor(
     //달력 모듈
     val calendar = MyCalendar()
 
+    private val _days = MutableStateFlow(listOf<Int>())
+    val days : StateFlow<List<Int>>
+        get() = _days
+
     //로그인 상태 유지
     private val _isLogin = MutableStateFlow(false)
     val isLogin : StateFlow<Boolean>

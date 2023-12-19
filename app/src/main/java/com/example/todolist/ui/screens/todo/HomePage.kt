@@ -35,6 +35,7 @@ import com.example.todolist.Screens
 import com.example.todolist.ui.components.MenuFAB
 import com.example.todolist.ui.components.TodoGroupItem
 import com.example.todolist.ui.components.TopBar
+import com.example.todolist.ui.components.WeekCalendar
 import com.example.todolist.viewModel.TodoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -64,6 +65,9 @@ fun HomePage(
     val isMenuClicked = remember{mutableStateOf(false)}
 
     val scrollState = rememberScrollState()
+
+    val days = todoViewModel.days.collectAsState()
+    var selectedDay = remember{mutableStateOf(todoViewModel.getToday()[0].substring(10,11).toInt())}
 
     //back event
     BackHandler {
@@ -106,7 +110,15 @@ fun HomePage(
                 modifier = Modifier.fillMaxWidth()
             ){
                 /** 날짜를 선택할 수 있는 Spinner */
-//                Spinner(value = , onValueChanged = , items = )
+                WeekCalendar(
+                    value = selectedDay.value,
+                    onValueChanged = {
+                        selectedDay.value = it
+                    },
+                    items = days.value,
+                    onSlideNext = {},
+                    onSlidePrev = {}
+                )
 
                 /** /날짜/ + /</ + />/ */
             }

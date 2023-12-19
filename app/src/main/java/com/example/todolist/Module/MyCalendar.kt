@@ -102,7 +102,7 @@ class MyCalendar {
         val todayDate = LocalDateTime.now()
 
         //날짜 출력 format
-        val dateFormat = DateTimeFormatter.ofPattern("yyyy. MM. dd")
+        val dateFormat = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")
         returnList.add(dateFormat.format(todayDate))
 
         //시간 출력 format
