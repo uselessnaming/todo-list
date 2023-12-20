@@ -281,10 +281,9 @@ fun AddTodoPage(
                         )
                     }
                 }
-
-
             }
-            Spacer(Modifier.height(1f.dp))
+
+            Spacer(Modifier.weight(1f))
 
             Row(
                 modifier = Modifier.fillMaxWidth()
