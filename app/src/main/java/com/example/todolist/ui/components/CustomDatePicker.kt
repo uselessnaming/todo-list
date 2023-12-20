@@ -35,7 +35,7 @@ fun CustomDatePicker(
     date : String,
     onDateChanged : (Long) -> Unit = {}
 ){
-    val format = "yyyy. MM. dd"
+    val format = "yyyy년 MM월 dd일"
     val localeKorea = Locale("ko", "KR")
     val dateFormat = SimpleDateFormat(format, localeKorea)
     var isClicked by remember{mutableStateOf(false)}

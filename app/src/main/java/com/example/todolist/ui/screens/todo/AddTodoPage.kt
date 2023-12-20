@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -33,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -277,6 +280,27 @@ fun AddTodoPage(
                             }
                         )
                     }
+                }
+
+
+            }
+            Spacer(Modifier.height(1f.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .defaultMinSize(minHeight = 40.dp),
+                horizontalArrangement = Arrangement.Center
+            ){
+                Button(
+                    onClick = {
+                        //추가
+                    }
+                ){
+                    Text(
+                        modifier = Modifier,
+                        text = "추가",
+                        fontSize = 26.sp
+                    )
                 }
             }
         }
