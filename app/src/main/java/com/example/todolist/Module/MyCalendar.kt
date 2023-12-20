@@ -6,7 +6,9 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
 class MyCalendar {
-    
+
+    val TAG = "MyCalendar"
+
     val calendar = Calendar.getInstance()
 
     //오늘의 날짜 미리 가져오기
@@ -34,26 +36,27 @@ class MyCalendar {
         day_of_week = today.day_of_week
 
         selectedMyDate = MyDate(year, month, day, day_of_week)
+
         dayList = arrayListOf()
 
         val myDate = MyDate(year, month, day, day_of_week)
-        for (i:Int in 1..7) {
+        for (i in 1..7) {
             val diff = i - day_of_week
             dayList.add(calDate(myDate, diff))
         }
     }
 
     //날짜를 계산하는 함수
-    private fun calDate(myDate : MyDate, diff : Int) : MyDate{
-        val calendar = Calendar.getInstance()
-        calendar.set(myDate.year, myDate.month-1, myDate.day)
-        calendar.add(Calendar.DAY_OF_WEEK, diff)
+    private fun calDate(date : MyDate, diff : Int) : MyDate{
+        val tmpCalendar = Calendar.getInstance()
+        tmpCalendar.set(date.year, date.month-1, date.day)
+        tmpCalendar.add(Calendar.DAY_OF_WEEK, diff)
 
         return MyDate(
-            year = calendar.get(Calendar.YEAR),
-            month = calendar.get(Calendar.MONTH)+1,
-            day = calendar.get(Calendar.DAY_OF_WEEK),
-            day_of_week = myDate.day_of_week
+            year = tmpCalendar.get(Calendar.YEAR),
+            month = tmpCalendar.get(Calendar.MONTH)+1,
+            day = tmpCalendar.get(Calendar.DAY_OF_MONTH),
+            day_of_week = tmpCalendar.get(Calendar.DAY_OF_WEEK)
         )
     }
 
@@ -64,13 +67,23 @@ class MyCalendar {
 
     //다움 주로 이동
     fun setNextWeek(){
+
         //dayList를 초기화
         dayList.clear()
         
         //다음 주로 이동하면 현재 날짜 + 일주일
-        val calendar = Calendar.getInstance()
-        calendar.set(selectedMyDate.year, selectedMyDate.month-1, selectedMyDate.day)
-        calendar.add(Calendar.DAY_OF_WEEK, 7)
+        val tmpCalendar = Calendar.getInstance()
+        tmpCalendar.set(selectedMyDate.year, selectedMyDate.month-1, selectedMyDate.day)
+        tmpCalendar.add(Calendar.DAY_OF_WEEK, 7)
+
+        val newDate = MyDate(
+            year = tmpCalendar.get(Calendar.YEAR),
+            month = tmpCalendar.get(Calendar.MONTH)+1,
+            day = tmpCalendar.get(Calendar.DAY_OF_MONTH),
+            day_of_week = tmpCalendar.get(Calendar.DAY_OF_WEEK)
+        )
+
+        selectedMyDate = newDate
 
         for (i:Int in 1..7) {
             val diff = i - day_of_week
@@ -84,13 +97,22 @@ class MyCalendar {
         dayList.clear()
         
         //이전 주로 이동하면 현재 날짜 - 일주일
-        val calendar = Calendar.getInstance()
-        calendar.set(selectedMyDate.year, selectedMyDate.month-1, selectedMyDate.day)
-        calendar.add(Calendar.DAY_OF_WEEK, -7)
+        val tmpCalendar = Calendar.getInstance()
+        tmpCalendar.set(selectedMyDate.year, selectedMyDate.month-1, selectedMyDate.day)
+        tmpCalendar.add(Calendar.DAY_OF_WEEK, -7)
+
+        val newDate = MyDate(
+            year = tmpCalendar.get(Calendar.YEAR),
+            month = tmpCalendar.get(Calendar.MONTH)+1,
+            day = tmpCalendar.get(Calendar.DAY_OF_MONTH),
+            day_of_week = tmpCalendar.get(Calendar.DAY_OF_WEEK)
+        )
+
+        selectedMyDate = newDate
 
         for (i:Int in 1..7) {
             val diff = i - day_of_week
-            dayList.add(calDate(selectedMyDate, diff))
+            dayList.add(calDate(newDate, diff))
         }
     }
 

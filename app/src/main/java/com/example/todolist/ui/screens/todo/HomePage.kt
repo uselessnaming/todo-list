@@ -11,11 +11,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,7 +33,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.todolist.Data.showToast
@@ -67,7 +75,7 @@ fun HomePage(
     val scrollState = rememberScrollState()
 
     val days = todoViewModel.days.collectAsState()
-    var selectedDay = remember{mutableStateOf(todoViewModel.getToday()[0].substring(10,11).toInt())}
+    var selectedDay = remember{mutableStateOf(todoViewModel.getSelectedDay())}
 
     //back event
     BackHandler {
@@ -107,6 +115,45 @@ fun HomePage(
             Spacer(Modifier.height(10.dp))
 
             Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                Text(
+                    text = "${selectedDay.value.year}년 ${selectedDay.value.month}월 ${selectedDay.value.day}일",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight(500)
+                )
+
+                Row{
+                    // << 버튼
+                    IconButton(
+                        onClick = {
+                            todoViewModel.setPrevWeek()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowLeft,
+                            contentDescription = "전 주"
+                        )
+                    }
+                    
+                    Spacer(Modifier.width(10.dp))
+                    
+                    // >> 버튼
+                    IconButton(
+                        onClick = {
+                            todoViewModel.setNextWeek()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowRight,
+                            contentDescription = "다음 주"
+                        )
+                    }
+                }
+            }
+
+            Row(
                 modifier = Modifier.fillMaxWidth()
             ){
                 /** 날짜를 선택할 수 있는 Spinner */
@@ -114,14 +161,19 @@ fun HomePage(
                     value = selectedDay.value,
                     onValueChanged = {
                         selectedDay.value = it
+                        todoViewModel.setSelectedDay(it)
                     },
                     items = days.value,
-                    onSlideNext = {},
-                    onSlidePrev = {}
+                    onSlideNext = {
+                        todoViewModel.setPrevWeek()
+                    },
+                    onSlidePrev = {
+                        todoViewModel.setNextWeek()
+                    }
                 )
-
-                /** /날짜/ + /</ + />/ */
             }
+
+            Spacer(Modifier.height(10.dp))
 
             /** 날짜에 맞는 TodoList */
             LazyColumn{

@@ -1,9 +1,9 @@
 package com.example.todolist.viewModel
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.todolist.Data.Calendar.MyDate
 import com.example.todolist.Data.DataClass.TodoGroupInTodo
 import com.example.todolist.Data.LoginDto.User
 import com.example.todolist.Data.Todo
@@ -31,10 +31,6 @@ class TodoViewModel @Inject constructor(
     //달력 모듈
     val calendar = MyCalendar()
 
-    private val _days = MutableStateFlow(listOf<Int>())
-    val days : StateFlow<List<Int>>
-        get() = _days
-
     //로그인 상태 유지
     private val _isLogin = MutableStateFlow(false)
     val isLogin : StateFlow<Boolean>
@@ -44,6 +40,11 @@ class TodoViewModel @Inject constructor(
     private val _id = MutableStateFlow(0)
     val id : StateFlow<Int>
         get() = _id
+
+    //dayList
+    private val _days = MutableStateFlow(listOf<MyDate>())
+    val days : StateFlow<List<MyDate>>
+        get() = _days
 
     //error msg 관리
     private val _errMsg = MutableStateFlow<String?>(null)
@@ -80,8 +81,6 @@ class TodoViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.IO){
                 _id.value = id
                 _todoGroups.tryEmit(todoRepository.getGroups(id))
-                Log.d(TAG, "_todosGroups : ${_todoGroups.value}")
-
 
                 val tmpList = arrayListOf<Todo>()
                 todoGroups.value.forEach{
@@ -90,6 +89,11 @@ class TodoViewModel @Inject constructor(
 
                 _todos.tryEmit(tmpList)
             }
+            val tmp = mutableListOf<MyDate>()
+            calendar.dayList.forEach{
+                tmp.add(it)
+            }
+            _days.value = tmp
         }
     }
 
@@ -98,7 +102,6 @@ class TodoViewModel @Inject constructor(
 
         var result : Todo? = null
 
-        Log.d(TAG, "todos : ${todos.value}")
         todos.value.forEach{
             if (id.toInt() == it.todoNum){
                 result = it
@@ -106,5 +109,39 @@ class TodoViewModel @Inject constructor(
             }
         }
         return result ?: throw NullPointerException("Error : Todo is NULL in getTodo() / ${TAG}")
+    }
+
+    //다음 주로 이동
+    fun setNextWeek(){
+        calendar.setNextWeek()
+
+        val tmp = mutableListOf<MyDate>()
+        calendar.dayList.forEach{
+            tmp.add(it)
+        }
+
+        _days.value = tmp
+    }
+
+    //전 주로 이동
+    fun setPrevWeek(){
+        calendar.setPrevWeek()
+
+        val tmp = mutableListOf<MyDate>()
+        calendar.dayList.forEach{
+            tmp.add(it)
+        }
+
+        _days.value = tmp
+    }
+
+    //selectedDate를 반환
+    fun getSelectedDay() : MyDate{
+        return calendar.selectedMyDate
+    }
+
+    //selectedDate를 설정
+    fun setSelectedDay(date : MyDate){
+        calendar.setDate(date)
     }
 }
