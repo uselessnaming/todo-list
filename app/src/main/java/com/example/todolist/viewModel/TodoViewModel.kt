@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todolist.Data.Calendar.MyDate
 import com.example.todolist.Data.DataClass.TodoGroupInTodo
+import com.example.todolist.Data.LoginDto.LoginRequestDto
 import com.example.todolist.Data.LoginDto.User
 import com.example.todolist.Data.Todo
+import com.example.todolist.Data.saveAuthToken
 import com.example.todolist.Module.MyCalendar
 import com.example.todolist.Module.TodoRepository
 import com.example.todolist.Module.UserRepository
@@ -75,10 +77,25 @@ class TodoViewModel @Inject constructor(
 
     fun getToday() = calendar.getToday()
 
+    //로그인 테스트
+    fun login(){
+        runBlocking{
+            viewModelScope.launch(Dispatchers.IO){
+                val reqDto = LoginRequestDto(
+                    clientId = "testtest",
+                    clientPassword = "q1w2e3r4t5@"
+                )
+                val result = repository.login(reqDto)
+                saveAuthToken(context, result.data)
+            }
+        }
+    }
+
     //로그인 기능 x 테스트 용
     fun setClientNum(id : Int){
         runBlocking{
             viewModelScope.launch(Dispatchers.IO){
+
                 _id.value = id
                 _todoGroups.tryEmit(todoRepository.getGroups(id))
 

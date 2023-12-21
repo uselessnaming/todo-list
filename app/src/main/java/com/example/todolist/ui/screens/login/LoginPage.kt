@@ -189,7 +189,7 @@ fun LoginPage(
                     .weight(1f)
                     .clickable {
                         //임시 client 번호 삽입
-                        todoViewModel.setClientNum(4)
+                        todoViewModel.setClientNum(5)
                         //임시 홈페이지 이동
                         navController.navigate(Screens.HomePage.name)
                     },
