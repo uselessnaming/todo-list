@@ -1,6 +1,7 @@
 package com.example.todolist.ui.screens.todo
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -33,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,7 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.todolist.ui.components.CustomDatePicker
-import com.example.todolist.ui.components.CustomTimePicker
+import com.example.todolist.ui.components.TimePickerDialog
 import com.example.todolist.ui.components.TopBar
 import com.example.todolist.ui.theme.TodoListTheme
 import com.example.todolist.viewModel.TodoViewModel
@@ -57,11 +60,30 @@ fun AddTodoPage(
     val today = todoViewModel.getToday()
     val today_date = today[0]
 
-    var selectedStartHour by remember{mutableStateOf(todoViewModel.calendar.getToday()[1].toInt())}
+    val hours = mutableListOf(-1,-1,-1,-1,-1,-1)
+    hours.addAll((0..12).toList())
+    hours.addAll(listOf(-1,-1,-1,-1,-1,-1))
+    val minutes = mutableListOf(-1,-1,-1,-1,-1,-1)
+    minutes.addAll((0..55 step(5)).toList())
+    minutes.addAll(listOf(-1,-1,-1,-1,-1,-1))
+
+    var selectedStartHour by remember{
+        var value = mutableStateOf(todoViewModel.calendar.getToday()[1].toInt())
+        if (value.value > 12) {
+            value.value -= 12
+        }
+        value
+    }
     var selectedStartMinutes by remember{mutableStateOf(todoViewModel.calendar.getToday()[2].toInt())}
     var selectedStartAmPm by remember{mutableStateOf(if (selectedStartHour > 12) "오후" else "오전")}
 
-    var selectedEndHour by remember{mutableStateOf(todoViewModel.calendar.getToday()[1].toInt())}
+    var selectedEndHour by remember{
+        var value = mutableStateOf(todoViewModel.calendar.getToday()[1].toInt())
+        if (value.value > 12) {
+            value.value -= 12
+        }
+        value
+    }
     var selectedEndMinutes by remember{mutableStateOf(todoViewModel.calendar.getToday()[2].toInt())}
     var selectedEndAmPm by remember{mutableStateOf(if (selectedEndHour > 12) "오후" else "오전")}
 
@@ -71,8 +93,61 @@ fun AddTodoPage(
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
 
+    var isShowTimePicker by remember{mutableStateOf(false)}
+    var type by remember{mutableStateOf("")}
+    
+    if (isShowTimePicker){
+        TimePickerDialog(
+            modifier = Modifier
+                .width((screenWidth * 4) / 5)
+                .height(screenHeight / 2)
+                .background(color = Color.White, shape = RoundedCornerShape(25.dp)),
+            onDismissRequest = {
+                isShowTimePicker = false
+            },
+            onUpdateDate = {
+                if (type == "start"){
+                    selectedStartHour = it.first
+                    selectedStartMinutes = it.second
+                    selectedStartAmPm = it.third
+                } else if (type == "end"){
+                    selectedEndHour = it.first
+                    selectedEndMinutes = it.second
+                    selectedEndAmPm = it.third
+                }
+            },
+            selectedHour = if(type == "start") selectedStartHour else selectedEndHour,
+            selectedMinute = if(type == "start") selectedStartMinutes else selectedEndMinutes,
+            am_pm = if(type == "start") selectedStartAmPm else selectedEndAmPm,
+            hours = hours,
+            minutes = minutes,
+            onHourChanged = {
+                if (type == "start"){
+                    selectedStartHour = it
+                } else {
+                    selectedEndHour = it
+                }
+            },
+            onMinuteChanged = {
+                if (type == "start"){
+                    selectedStartMinutes = it
+                } else {
+                    selectedEndMinutes = it
+                }
+            },
+            onAmPmChanged = {
+                if (type == "start"){
+                    selectedStartAmPm = if(selectedStartAmPm == "오전") "오후" else "오전"
+                } else {
+                    selectedEndAmPm = if(selectedEndAmPm == "오전") "오후" else "오전"
+                }
+            }
+        )
+    }
+    
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .verticalScroll(scrollState)
     ){
         //TopBar
@@ -85,7 +160,7 @@ fun AddTodoPage(
             },
             onActionClick = {}
         )
-
+        
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -241,15 +316,16 @@ fun AddTodoPage(
                         Spacer(Modifier.height(10.dp))
 
                         //시간 선택
-                        CustomTimePicker(
-                            modifier = Modifier.height(120.dp),
-                            hour = selectedStartHour,
-                            minute = selectedStartMinutes,
-                            onUpdateDate = {
-                                selectedStartHour = it.first
-                                selectedStartMinutes = it.second
-                                selectedStartAmPm = it.third
-                            }
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    type = "start"
+                                    isShowTimePicker = true
+                                },
+                            text = "${selectedStartAmPm} ${selectedStartHour}시 ${selectedStartMinutes}분",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center
                         )
                     }
 
@@ -269,15 +345,16 @@ fun AddTodoPage(
                         Spacer(Modifier.height(10.dp))
 
                         //시간 선택
-                        CustomTimePicker(
-                            modifier = Modifier.height(120.dp),
-                            hour = selectedEndHour,
-                            minute = selectedEndMinutes,
-                            onUpdateDate = {
-                                selectedEndHour = it.first
-                                selectedEndMinutes = it.second
-                                selectedEndAmPm = it.third
-                            }
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    type = "end"
+                                    isShowTimePicker = true
+                                },
+                            text = "${selectedEndAmPm} ${selectedEndHour}시 ${selectedEndMinutes}분",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
@@ -286,7 +363,8 @@ fun AddTodoPage(
             Spacer(Modifier.weight(1f))
 
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .defaultMinSize(minHeight = 40.dp),
                 horizontalArrangement = Arrangement.Center
             ){
