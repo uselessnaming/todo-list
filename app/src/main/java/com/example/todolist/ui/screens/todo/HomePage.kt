@@ -1,6 +1,7 @@
 package com.example.todolist.ui.screens.todo
 
 import android.app.Activity
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -79,6 +81,8 @@ fun HomePage(
 
     val days = todoViewModel.days.collectAsState()
     var selectedDay = remember{mutableStateOf(todoViewModel.getSelectedDay())}
+
+    val errorState = todoViewModel.errMsg.collectAsState()
 
     //back event
     BackHandler {
@@ -218,6 +222,13 @@ fun HomePage(
                     navController.navigate(Screens.AddTodoPage.name)
                 }
             )
+        }
+    }
+    LaunchedEffect(errorState.value){
+        if (errorState.value != null){
+            Toast.makeText(context, "${errorState.value}\n다시 로그인 해주세요", Toast.LENGTH_SHORT).show()
+            navController.navigate(Screens.LoginPage.name)
+            todoViewModel.resetErrMsg()
         }
     }
 }

@@ -10,12 +10,12 @@ class TodoRepository @Inject constructor(
     val TAG = "TodoRepository"
     
     //id를 기반으로 Todo 정보들을 가져옴
-    fun getTodos(id : Int) : List<Todo>{
+    fun getTodos(token: String, id : Int) : List<Todo>{
         val todoList = ArrayList<Todo>()
 
         //Todo Group이 있는 Todo List들을 우선 삽입
         try{
-            val result = todoApi.getAllTodosInGroup(id).execute()
+            val result = todoApi.getAllTodosInGroup(token, id).execute()
             if (result.isSuccessful){
                 val response = result.body() ?: throw NullPointerException("Error : Data is NULL in ${TAG} / getTodos()")
                 val data = response.data
@@ -34,12 +34,12 @@ class TodoRepository @Inject constructor(
         return todoList
     }
 
-    fun getGroups(id : Int) : List<TodoGroupInTodo>{
+    fun getGroups(id : Int, token : String) : List<TodoGroupInTodo>{
         val todoGroups = arrayListOf<TodoGroupInTodo>()
 
         //group이 있는 Todo
         try{
-            val result = todoApi.getAllTodosInGroup(id).execute()
+            val result = todoApi.getAllTodosInGroup(token, id).execute()
             if (result.isSuccessful){
                 val response = result.body() ?: throw NullPointerException("Error : Data is NULL in getGroups() / ${TAG}")
 
@@ -54,7 +54,7 @@ class TodoRepository @Inject constructor(
         val noTitleTodos = arrayListOf<Todo>()
         //group이 없는 todo
         try{
-            val result = todoApi.getTodosNoGroup(id).execute()
+            val result = todoApi.getTodosNoGroup(token, id).execute()
             if (result.isSuccessful){
                 val response = result.body() ?: throw NullPointerException("Error : Data is NULL in ${TAG} / getTodos()")
                 val data = response.data

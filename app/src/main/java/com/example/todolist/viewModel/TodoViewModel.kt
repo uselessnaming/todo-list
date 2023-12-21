@@ -1,6 +1,7 @@
 package com.example.todolist.viewModel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todolist.Data.Calendar.MyDate
@@ -8,6 +9,7 @@ import com.example.todolist.Data.DataClass.TodoGroupInTodo
 import com.example.todolist.Data.LoginDto.LoginRequestDto
 import com.example.todolist.Data.LoginDto.User
 import com.example.todolist.Data.Todo
+import com.example.todolist.Data.readAuthToken
 import com.example.todolist.Data.saveAuthToken
 import com.example.todolist.Module.MyCalendar
 import com.example.todolist.Module.TodoRepository
@@ -72,7 +74,8 @@ class TodoViewModel @Inject constructor(
     //로그아웃
     fun logout(){
         _isLogin.value = false
-        _id.value = 0
+        _id.value = -1
+        saveAuthToken(context, null)
     }
 
     fun getToday() = calendar.getToday()
@@ -93,11 +96,20 @@ class TodoViewModel @Inject constructor(
 
     //로그인 기능 x 테스트 용
     fun setClientNum(id : Int){
+        login()
         runBlocking{
             viewModelScope.launch(Dispatchers.IO){
 
                 _id.value = id
-                _todoGroups.tryEmit(todoRepository.getGroups(id))
+                val token = readAuthToken(context)
+
+                Log.d(TAG, "login : ${token}")
+
+                if (token == null){
+                    _errMsg.tryEmit("로그인 정보가 없습니다.")
+                } else {
+                    _todoGroups.tryEmit(todoRepository.getGroups(id, token))
+                }
 
                 val tmpList = arrayListOf<Todo>()
                 todoGroups.value.forEach{
@@ -105,12 +117,14 @@ class TodoViewModel @Inject constructor(
                 }
 
                 _todos.tryEmit(tmpList)
+                Log.d(TAG, "todos : ${todos.value}")
             }
             val tmp = mutableListOf<MyDate>()
             calendar.dayList.forEach{
                 tmp.add(it)
             }
             _days.value = tmp
+            Log.d(TAG, "days : ${days.value}")
         }
     }
 
@@ -160,5 +174,10 @@ class TodoViewModel @Inject constructor(
     //selectedDate를 설정
     fun setSelectedDay(date : MyDate){
         calendar.setDate(date)
+    }
+
+    //errMsg 초기화
+    fun resetErrMsg(){
+        _errMsg.value = null
     }
 }

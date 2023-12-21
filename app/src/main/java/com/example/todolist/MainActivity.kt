@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.todolist.Data.saveAuthToken
 import com.example.todolist.ui.screens.drawerMenu.MyPage
 import com.example.todolist.ui.screens.drawerMenu.SettingPage
 import com.example.todolist.ui.screens.login.AddUserPage
@@ -101,5 +102,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        saveAuthToken(applicationContext, null)
     }
 }

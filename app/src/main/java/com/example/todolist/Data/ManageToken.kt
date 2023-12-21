@@ -10,12 +10,16 @@ import kotlinx.coroutines.runBlocking
 private val Context.dataStore by preferencesDataStore(name = "user_prefs")
 
 //토큰 저장
-fun saveAuthToken(context : Context, token : String){
+fun saveAuthToken(context : Context, token : String?){
     val authTokenKey = stringPreferencesKey("auth_token")
 
     runBlocking{
         context.dataStore.edit{
-            it[authTokenKey] = token
+            if (token == null){
+                it.remove(authTokenKey)
+            } else {
+                it[authTokenKey] = token
+            }
         }
     }
 }
