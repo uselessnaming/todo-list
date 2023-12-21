@@ -38,10 +38,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.todolist.Data.DataClass.TodoGroup
 import com.example.todolist.Data.showToast
 import com.example.todolist.Screens
 import com.example.todolist.ui.components.MenuFAB
-import com.example.todolist.ui.components.TodoGroupItem
+import com.example.todolist.ui.components.TodoGroupHeader
+import com.example.todolist.ui.components.TodoItem
 import com.example.todolist.ui.components.TopBar
 import com.example.todolist.ui.components.WeekCalendar
 import com.example.todolist.viewModel.TodoViewModel
@@ -64,7 +66,8 @@ fun HomePage(
     val screenWidth = configuration.screenWidthDp.dp
 
     //todos
-    val todos = todoViewModel.todoGroups.collectAsState()
+    val todos = todoViewModel.todos.collectAsState()
+    val todoGroups = todoViewModel.todoGroups.collectAsState()
 
     //뒤로가기 클릭 여부
     var backPressed by remember{mutableStateOf(false)}
@@ -176,11 +179,28 @@ fun HomePage(
             Spacer(Modifier.height(10.dp))
 
             /** 날짜에 맞는 TodoList */
-            LazyColumn{
-                items(todos.value){group ->
-                    TodoGroupItem(
-                        todos = group.todoList,
-                        navController = navController,
+            var groupHeaderNum = 0
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(5.dp)
+            ){
+                items(todos.value){todo ->
+                    //그룹 헤더를 보여주는 View
+                    if (groupHeaderNum != todo.groupNum){
+                        /** Api 확인해서 title을 가지고 todoGroup 정보를 가져올 수 있는지 확인 */
+                        val todoGroup = TodoGroup(groupNum = 0, groupName = "test", isImportant = false)
+                        TodoGroupHeader(
+                            modifier = Modifier,
+                            todoGroup = todoGroup
+                        )
+                        Spacer(Modifier.height(5.dp))
+                        groupHeaderNum = todo.groupNum
+                    }
+                    //내부 아이템
+                    TodoItem(
+                        todo = todo,
+                        onClick = {
+                            navController.navigate("${Screens.DescriptionPage.name}/${todo.todoNum}")
+                        }
                     )
                 }
             }
