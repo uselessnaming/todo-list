@@ -2,11 +2,11 @@ package com.example.todolist.Data.LoginDto
 
 import com.google.gson.annotations.SerializedName
 
-data class DelUserRespDto(
+data class CommonUserRespDto(
     @SerializedName("commonResponse")
-    val commonResponse : String,
+    val commonResponse: String,
     @SerializedName("data")
-    val data : String?,
+    val data: String,
     @SerializedName("message")
-    val message : String
+    val message: String
 )

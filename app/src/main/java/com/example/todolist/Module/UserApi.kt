@@ -1,6 +1,6 @@
 package com.example.todolist.Module
 
-import com.example.todolist.Data.LoginDto.DelUserRespDto
+import com.example.todolist.Data.LoginDto.CommonUserRespDto
 import com.example.todolist.Data.LoginDto.GetAllRespDto
 import com.example.todolist.Data.LoginDto.LoginRequestDto
 import com.example.todolist.Data.LoginDto.UpdateUserReqDto
@@ -30,9 +30,9 @@ interface UserApi {
 
     //회원 탈퇴
     @DELETE("/clients/{clientnum}")
-    fun deleteUser(@Path("clientnum") clientNum : Int) : Call<DelUserRespDto>
+    fun deleteUser(@Path("clientnum") clientNum : Int) : Call<CommonUserRespDto>
 
     //로그인
     @POST("/clients/sign-in")
-    fun login(@Body requestDto : LoginRequestDto) : Call<>
+    fun login(@Body requestDto : LoginRequestDto) : Call<CommonUserRespDto>
 }
