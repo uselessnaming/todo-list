@@ -22,11 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,8 +34,6 @@ fun CustomDatePicker(
     onDateChanged : (Long) -> Unit = {}
 ){
     val format = "yyyy년 MM월 dd일"
-    val localeKorea = Locale("ko", "KR")
-    val dateFormat = SimpleDateFormat(format, localeKorea)
     var isClicked by remember{mutableStateOf(false)}
     val formatter = DateTimeFormatter.ofPattern(format)
     val initTimeStr = LocalDate.parse(date, formatter)
@@ -85,7 +81,7 @@ fun CustomDatePicker(
             }
     ){
         Text(
-            text = dateFormat.format(datePickerState.selectedDateMillis)
+            text = date
         )
     }
 }
@@ -101,7 +97,7 @@ fun TestDatePicker(){
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         CustomDatePicker(
-            date = "2023. 11. 29"
+            date = "2023년 11월 29일"
         )
     }
 }

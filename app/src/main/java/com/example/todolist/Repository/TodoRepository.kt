@@ -29,8 +29,6 @@ class TodoRepository @Inject constructor(
         }
 
         //Todo Group이 없는 Todo List들 삽입
-
-
         return todoList
     }
 
@@ -52,6 +50,7 @@ class TodoRepository @Inject constructor(
         }
 
         val noTitleTodos = arrayListOf<Todo>()
+
         //group이 없는 todo
         try{
             val result = todoApi.getTodosNoGroup(token, id).execute()

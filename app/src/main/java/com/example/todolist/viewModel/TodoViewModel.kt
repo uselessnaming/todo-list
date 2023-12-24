@@ -96,9 +96,16 @@ class TodoViewModel @Inject constructor(
 
     //로그인 기능 x 테스트 용
     fun setClientNum(id : Int){
-        login()
+//        login()
         runBlocking{
             viewModelScope.launch(Dispatchers.IO){
+
+                val reqDto = LoginRequestDto(
+                    clientId = "testtest",
+                    clientPassword = "q1w2e3r4t5@"
+                )
+                val result = repository.login(reqDto)
+                saveAuthToken(context, result.data)
 
                 _id.value = id
                 val token = readAuthToken(context)

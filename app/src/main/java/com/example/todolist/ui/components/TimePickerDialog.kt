@@ -1,5 +1,6 @@
 package com.example.todolist.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -58,6 +59,8 @@ fun TimePickerDialog(
     onMinuteChanged : (Int) -> Unit,
     onAmPmChanged : () -> Unit,
 ){
+    val TAG = "TimePickerDialog"
+
     val amPmListState = rememberLazyListState()
     val hourListState = rememberLazyListState()
     val minuteListState = rememberLazyListState()
@@ -81,13 +84,15 @@ fun TimePickerDialog(
 
                 //오전 오후
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
                         .fillMaxHeight(),
                     verticalArrangement = Arrangement.Center
                 ){
                     Spacer(Modifier.height(15.dp))
                     Text(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .height(25.dp)
                             .clickable {
                                 onAmPmChanged()
@@ -209,7 +214,7 @@ fun TimePickerDialog(
                         .align(Alignment.CenterVertically)
                         .clickable {
                             //확인 이벤트
-                            onUpdateDate(Triple(selectedHour,selectedMinute,am_pm))
+                            onUpdateDate(Triple(selectedHour, selectedMinute, am_pm))
                             onDismissRequest()
                         },
                     text = "확인",
@@ -220,6 +225,8 @@ fun TimePickerDialog(
         LaunchedEffect(selectedHour){
             val itemHeight = 30.dp.value
             val total = hourListState.layoutInfo.viewportSize.height - itemHeight
+            Log.d(TAG, "${hours.indexOf(selectedHour)}")
+            Log.d(TAG, "${-(total/2).toInt()}")
             hourListState.scrollToItem(
                 index = hours.indexOf(selectedHour),
                 scrollOffset = -(total/2).toInt()
