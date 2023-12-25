@@ -24,6 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -108,7 +110,7 @@ fun WeekCalendar(
                     modifier = Modifier.fillMaxWidth(),
                     text = dayList[i],
                     fontSize = 20.sp,
-                    color = Black,
+                    color = if (dayList[i] == "일") Red else if (dayList[i] == "토") Blue else Black,
                     textAlign = TextAlign.Center
                 )
 

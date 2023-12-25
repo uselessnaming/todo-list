@@ -2,6 +2,7 @@ package com.example.todolist.Module
 
 import com.example.todolist.Data.DataClass.TodoGroupInTodo
 import com.example.todolist.Data.Todo
+import com.example.todolist.Data.TodoDto.TodoReqDto
 import javax.inject.Inject
 
 class TodoRepository @Inject constructor(
@@ -67,7 +68,7 @@ class TodoRepository @Inject constructor(
         }
 
         noTitleTodos.forEach{
-            it.groupNum = 1000
+            it.groupNum = -1
         }
 
         //원래의 데이터 + noTitleTodos 추가
@@ -79,5 +80,20 @@ class TodoRepository @Inject constructor(
         todoGroups.add(noTitleGroup)
 
         return todoGroups
+    }
+
+    //Todo 추가
+    fun addTodo(token : String, clientNum : Int, todoReq : TodoReqDto) : String{
+        try {
+            val result = todoApi.addTodo(token, clientNum, todoReq).execute()
+
+            return if (result.isSuccessful){
+                "추가 성공"
+            } else {
+                "Error : ${result.code()}\n${result.errorBody()}"
+            }
+        } catch (e : Exception){
+            throw IllegalArgumentException(e.message)
+        }
     }
 }

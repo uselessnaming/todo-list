@@ -9,6 +9,7 @@ import com.example.todolist.Data.DataClass.TodoGroupInTodo
 import com.example.todolist.Data.LoginDto.LoginRequestDto
 import com.example.todolist.Data.LoginDto.User
 import com.example.todolist.Data.Todo
+import com.example.todolist.Data.TodoDto.TodoReqDto
 import com.example.todolist.Data.readAuthToken
 import com.example.todolist.Data.saveAuthToken
 import com.example.todolist.Module.MyCalendar
@@ -55,7 +56,7 @@ class TodoViewModel @Inject constructor(
     val errMsg : StateFlow<String?> = _errMsg
 
     //현재 유저의 Todo List
-    private val _todos = MutableStateFlow(listOf<Todo>())
+    private val _todos = MutableStateFlow(mutableListOf<Todo>())
     val todos : StateFlow<List<Todo>>
         get() = _todos
 
@@ -186,5 +187,36 @@ class TodoViewModel @Inject constructor(
     //errMsg 초기화
     fun resetErrMsg(){
         _errMsg.value = null
+    }
+
+    //todo추가
+    fun addTodo(
+        startDate : String,
+        endDate : String,
+        description : String,
+        title : String,
+        location : String,
+        todoGroup : TodoGroupInTodo
+    ){
+        val groupNum =  if (todoGroup.title == "No Group") -1 else {todoGroup.todoList[0].groupNum}
+        runBlocking{
+            viewModelScope.launch(Dispatchers.IO){
+                val newReq = TodoReqDto(
+                    endDate = endDate,
+                    isFinished = false,
+                    startDate = startDate,
+                    desc = description,
+                    groupNum = groupNum,
+                    location = location,
+                    title = title
+                )
+                val token = readAuthToken(context) ?: throw NullPointerException("Token Data is NULL on ${TAG} in AddTodo()")
+                //data 추가
+                todoRepository.addTodo(token, id.value, newReq)
+
+                //data fetch
+                _todoGroups.tryEmit(todoRepository.getGroups(id.value, token))
+            }
+        }
     }
 }

@@ -1,6 +1,5 @@
 package com.example.todolist.ui.screens.todo
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,12 +22,16 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.todolist.Screens
 import com.example.todolist.ui.components.CustomDatePicker
 import com.example.todolist.ui.components.TimePickerDialog
 import com.example.todolist.ui.components.TopBar
@@ -83,8 +88,12 @@ fun AddTodoPage(
         }
         value
     }
-    var selectedStartMinutes by remember{mutableStateOf(todoViewModel.calendar.getToday()[2].toInt())}
-    var selectedStartAmPm by remember{mutableStateOf(if (selectedStartHour > 12) "오후" else "오전")}
+    var selectedStartMinutes by remember{
+        val tmp = mutableStateOf(todoViewModel.calendar.getToday()[2].toInt())
+        tmp.value = tmp.value - (tmp.value % 5)
+        tmp
+    }
+    var selectedStartAmPm by remember{mutableStateOf(if(todoViewModel.calendar.getToday()[1].toInt() > 12) "오후" else "오전")}
 
     var selectedEndHour by remember{
         var value = mutableStateOf(todoViewModel.calendar.getToday()[1].toInt())
@@ -93,8 +102,12 @@ fun AddTodoPage(
         }
         value
     }
-    var selectedEndMinutes by remember{mutableStateOf(todoViewModel.calendar.getToday()[2].toInt())}
-    var selectedEndAmPm by remember{mutableStateOf(if (selectedEndHour > 12) "오후" else "오전")}
+    var selectedEndMinutes by remember{
+        val tmp = mutableStateOf(todoViewModel.calendar.getToday()[2].toInt())
+        tmp.value = tmp.value - (tmp.value % 5)
+        tmp
+    }
+    var selectedEndAmPm by remember{mutableStateOf(if(todoViewModel.calendar.getToday()[1].toInt() > 12) "오후" else "오전")}
 
     val scrollState = rememberScrollState()
 
@@ -108,6 +121,17 @@ fun AddTodoPage(
     val format = "yyyy년 MM월 dd일"
     val localeKorea = Locale("ko", "KR")
     val dateFormat = SimpleDateFormat(format, localeKorea)
+
+    val todoGroups = todoViewModel.todoGroups.collectAsState()
+
+    var selectedGroup = remember{mutableStateOf(todoGroups.value[0])}
+
+    var isExpanded by remember{mutableStateOf(false)}
+    val onDropdownMenu = {
+        isExpanded = !isExpanded
+    }
+
+    val spinnerScrollState = rememberScrollState()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -225,6 +249,79 @@ fun AddTodoPage(
 
                 Spacer(Modifier.height(10.dp))
 
+                //todo group 받기
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(55.dp)
+                ){
+                    Column(
+                        modifier = Modifier.weight(1f)
+                            .fillMaxHeight(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ){
+                        Icon(
+                            imageVector = Icons.Filled.List,
+                            contentDescription = "Title"
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier.weight(5f)
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center
+                    ){
+                        if (todoGroups.value.isEmpty()) {
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "그룹 없음",
+                                fontSize = 20.sp,
+                                color = Black,
+                                textAlign = TextAlign.Center
+                            )
+                        } else {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onDropdownMenu()
+                                    },
+                                text = selectedGroup.value!!.title,
+                                fontSize = 18.sp,
+                                color = Black,
+                                textAlign = TextAlign.Center
+                            )
+
+                            DropdownMenu(
+                                modifier = Modifier.width(((screenWidth-20.dp) / 6) * 5),
+                                expanded = isExpanded,
+                                onDismissRequest = onDropdownMenu,
+                            ) {
+                                todoGroups.value.forEach{
+                                    Text(
+                                        modifier = Modifier.fillMaxWidth()
+                                            .clickable{
+                                                selectedGroup.value = it
+                                                onDropdownMenu()
+                                            },
+                                        text = it.title,
+                                        fontSize = 20.sp,
+                                        color = Black,
+                                        textAlign = TextAlign.Center
+                                    )
+
+                                    if (it != todoGroups.value[todoGroups.value.lastIndex]){
+                                        Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color.LightGray)
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                Spacer(Modifier.height(10.dp))
+
                 //todo description 입력
                 Row(
                     modifier = Modifier
@@ -304,7 +401,7 @@ fun AddTodoPage(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(80.dp)
+                        .height(120.dp)
                 ){
                     Column(
                         modifier = Modifier.weight(1f),
@@ -324,6 +421,16 @@ fun AddTodoPage(
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.Center
                         ){
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "시작 시간",
+                                fontSize = 15.sp,
+                                color = Black,
+                                textAlign = TextAlign.Center
+                            )
+                            
+                            Spacer(Modifier.height(15.dp))
+                            
                             //날짜 선택
                             CustomDatePicker(
                                 modifier = Modifier,
@@ -349,30 +456,32 @@ fun AddTodoPage(
                             )
                         }
 
-                        Spacer(Modifier.width(5.dp))
-
                         //endDate 입력
                         Column(
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.Center
                         ){
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "종료 시간",
+                                fontSize = 15.sp,
+                                color = Black,
+                                textAlign = TextAlign.Center
+                            )
+
+                            Spacer(Modifier.height(15.dp))
+                            
                             //날짜 선택
                             CustomDatePicker(
                                 modifier = Modifier,
                                 date = endDate, //viewmodel에서 오늘 날짜를 기본으로 설정
                                 onDateChanged = {
-                                    Log.d(TAG, "time : ${it}")
                                     val tmp = dateFormat.format(it)
-                                    Log.d(TAG, "end time : ${tmp}")
-                                    Log.d(TAG, "start time : ${startDate}")
                                     val tmpStart = LocalDate.of(startDate.substring(0,4).toInt(),startDate.substring(6,8).toInt(),startDate.substring(10,12).toInt())
                                     val tmpEnd = LocalDate.of(tmp.substring(0,4).toInt(),tmp.substring(6,8).toInt(),tmp.substring(10,12).toInt())
-                                    Log.d(TAG, "tmpStart tmpEnd (${tmpStart}, ${tmpEnd})")
                                     endDate = if (tmpStart.isBefore(tmpEnd)){
-                                        Log.d(TAG, "before : ${tmp}")
                                         tmp
                                     } else {
-                                        Log.d(TAG, "before : ${startDate}")
                                         startDate
                                     }
                                 }
@@ -407,6 +516,17 @@ fun AddTodoPage(
                     Button(
                         onClick = {
                             //추가
+                            todoViewModel.addTodo(
+                                startDate = startDate + " ${selectedStartAmPm} ${selectedStartHour}시 ${selectedStartMinutes}분",
+                                endDate = endDate + " ${selectedEndAmPm} ${selectedEndHour}시 ${selectedEndMinutes}분",
+                                description = content,
+                                location = loc,
+                                title = title,
+                                todoGroup = selectedGroup.value
+                            )
+
+                            //Home으로 이동
+                            navController.navigate(Screens.HomePage.name)
                         }
                     ){
                         Text(
@@ -419,8 +539,6 @@ fun AddTodoPage(
             }
         }
     }
-
-
 }
 
 @Preview
