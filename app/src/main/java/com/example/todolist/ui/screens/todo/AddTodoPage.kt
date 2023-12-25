@@ -131,8 +131,6 @@ fun AddTodoPage(
         isExpanded = !isExpanded
     }
 
-    val spinnerScrollState = rememberScrollState()
-
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -286,7 +284,7 @@ fun AddTodoPage(
                                     .clickable {
                                         onDropdownMenu()
                                     },
-                                text = selectedGroup.value!!.title,
+                                text = selectedGroup.value.title,
                                 fontSize = 18.sp,
                                 color = Black,
                                 textAlign = TextAlign.Center

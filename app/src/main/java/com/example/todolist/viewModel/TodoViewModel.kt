@@ -23,6 +23,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -64,6 +66,8 @@ class TodoViewModel @Inject constructor(
     private val _todoGroups = MutableStateFlow(listOf<TodoGroupInTodo>())
     val todoGroups : StateFlow<List<TodoGroupInTodo>>
         get() = _todoGroups
+
+
 
     suspend fun signUp(signUpReqDto : User) =
         viewModelScope.async(Dispatchers.IO){
@@ -217,6 +221,22 @@ class TodoViewModel @Inject constructor(
                 //data fetch
                 _todoGroups.tryEmit(todoRepository.getGroups(id.value, token))
             }
+        }
+    }
+
+    fun fetchTodos(date : String, todos : List<Todo>){
+        runBlocking {
+            val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA)
+            val stdToday = dateFormat.parse(date) ?: throw NullPointerException("Today is NULL on ${TAG} in fatchTodos()")
+
+            val result = mutableListOf<Todo>()
+            todos.forEach{
+                val day = dateFormat.parse(it.deadDate) ?: throw NullPointerException("Today is NULL on ${TAG} in fatchTodos()")
+                if (day.compareTo(stdToday) > 0){
+                    result.add(it)
+                }
+            }
+            _todos.tryEmit(result)
         }
     }
 }

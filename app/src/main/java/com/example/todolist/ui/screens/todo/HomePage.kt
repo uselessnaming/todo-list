@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -69,15 +68,9 @@ fun HomePage(
 
     //todos
     val todos = todoViewModel.todos.collectAsState()
-    val todoGroups = todoViewModel.todoGroups.collectAsState()
 
     //뒤로가기 클릭 여부
     var backPressed by remember{mutableStateOf(false)}
-
-    //drawer 상태
-    val isMenuClicked = remember{mutableStateOf(false)}
-
-    val scrollState = rememberScrollState()
 
     val days = todoViewModel.days.collectAsState()
     var selectedDay = remember{mutableStateOf(todoViewModel.getSelectedDay())}
@@ -230,5 +223,9 @@ fun HomePage(
             navController.navigate(Screens.LoginPage.name)
             todoViewModel.resetErrMsg()
         }
+    }
+    LaunchedEffect(selectedDay){
+        val dateString = "${selectedDay.value.year}년 ${selectedDay.value.month}월 ${selectedDay.value.day}일"
+        todoViewModel.fetchTodos(dateString, todos.value)
     }
 }
