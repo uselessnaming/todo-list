@@ -1,6 +1,5 @@
 package com.example.todolist.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -225,20 +224,24 @@ fun TimePickerDialog(
         LaunchedEffect(selectedHour){
             val itemHeight = 30.dp.value
             val total = hourListState.layoutInfo.viewportSize.height - itemHeight
-            Log.d(TAG, "${hours.indexOf(selectedHour)}")
-            Log.d(TAG, "${-(total/2).toInt()}")
-            hourListState.scrollToItem(
-                index = hours.indexOf(selectedHour),
-                scrollOffset = -(total/2).toInt()
-            )
+            val adjustedHour = hours.indexOf(selectedHour)
+            if (adjustedHour != -1){
+                hourListState.scrollToItem(
+                    index = adjustedHour,
+                    scrollOffset = -(total/2).toInt()
+                )
+            }
         }
         LaunchedEffect(selectedMinute){
             val itemHeight = 30.dp.value
             val total = minuteListState.layoutInfo.viewportSize.height - itemHeight
-            minuteListState.scrollToItem(
-                index = minutes.indexOf(selectedMinute),
-                scrollOffset = -(total/2).toInt()
-            )
+            val adjustedMinute = minutes.indexOf(selectedMinute)
+            if (adjustedMinute != -1){
+                minuteListState.scrollToItem(
+                    index = adjustedMinute,
+                    scrollOffset = -(total/2).toInt()
+                )
+            }
         }
         LaunchedEffect(am_pm){
             amPmListState.scrollToItem(am_pms.indexOf(am_pm))
