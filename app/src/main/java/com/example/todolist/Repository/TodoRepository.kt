@@ -2,6 +2,7 @@ package com.example.todolist.Module
 
 import com.example.todolist.Data.DataClass.TodoGroupInTodo
 import com.example.todolist.Data.Todo
+import com.example.todolist.Data.TodoDto.TodoGroupReqDto
 import com.example.todolist.Data.TodoDto.TodoReqDto
 import javax.inject.Inject
 
@@ -86,6 +87,26 @@ class TodoRepository @Inject constructor(
     fun addTodo(token : String, clientNum : Int, todoReq : TodoReqDto) : String{
         try {
             val result = todoApi.addTodo(token, clientNum, todoReq).execute()
+
+            return if (result.isSuccessful){
+                "추가 성공"
+            } else {
+                "Error : ${result.code()}\n${result.errorBody()}"
+            }
+        } catch (e : Exception){
+            throw IllegalArgumentException(e.message)
+        }
+    }
+
+    //todo group 추가
+    fun addTodoGroup(token : String, id : Int, title : String) : String {
+        try{
+            val newReqDto = TodoGroupReqDto(
+                groupName = title,
+                isImportant = false
+            )
+
+            val result = todoApi.addTodoGroup(token, clientNum = id, todoGroupReqDto = newReqDto).execute()
 
             return if (result.isSuccessful){
                 "추가 성공"

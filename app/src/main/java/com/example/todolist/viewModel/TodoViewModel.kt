@@ -67,8 +67,6 @@ class TodoViewModel @Inject constructor(
     val todoGroups : StateFlow<List<TodoGroupInTodo>>
         get() = _todoGroups
 
-
-
     suspend fun signUp(signUpReqDto : User) =
         viewModelScope.async(Dispatchers.IO){
             val result = repository.signUp(signUpReqDto)
@@ -224,6 +222,7 @@ class TodoViewModel @Inject constructor(
         }
     }
 
+    //데이터 갱신
     fun fetchTodos(date : String, todos : List<Todo>){
         runBlocking {
             val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA)
@@ -238,5 +237,21 @@ class TodoViewModel @Inject constructor(
             }
             _todos.tryEmit(result)
         }
+    }
+
+    //todo group 추가
+    fun addTodoGroup(
+        title : String
+    ){
+        val token = readAuthToken(context) ?: throw NullPointerException("Token is NULL on ${TAG} in addTodoGroup")
+        runBlocking{
+            viewModelScope.launch(Dispatchers.IO){
+                val resultMsg = todoRepository.addTodoGroup(token, id.value, title)
+                if (resultMsg != "추가 성공") {
+                    _errMsg.value = resultMsg
+                }
+            }
+        }
+        fetchTodos(calendar.getToday()[0], todos.value)
     }
 }
