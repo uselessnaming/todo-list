@@ -145,7 +145,9 @@ fun LoginPage(
             onClick = {
                 //id와 passwd가 있을 경우
                 if(id.isNotEmpty() && passwd.isNotEmpty()){
-                    /** 로그인 로직 */
+                    todoViewModel.login(userId = id, userPasswd = passwd)
+                    //임시 홈페이지 이동
+                    navController.navigate(Screens.HomePage.name)
                 }
                 //id와 passwd가 없을 경우
                 else {
@@ -188,10 +190,6 @@ fun LoginPage(
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
-                        //임시 client 번호 삽입
-                        todoViewModel.setClientNum(5)
-                        //임시 홈페이지 이동
-                        navController.navigate(Screens.HomePage.name)
                     },
                 text = "아이디 찾기",
                 color = LightGray,

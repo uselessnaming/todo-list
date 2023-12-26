@@ -84,22 +84,46 @@ class TodoViewModel @Inject constructor(
     fun getToday() = calendar.getToday()
 
     //로그인 테스트
-    fun login(){
+    fun login(userId : String, userPasswd : String){
         runBlocking{
             viewModelScope.launch(Dispatchers.IO){
                 val reqDto = LoginRequestDto(
-                    clientId = "testtest",
-                    clientPassword = "q1w2e3r4t5@"
+                    clientId = userId,
+                    clientPassword = userPasswd
                 )
                 val result = repository.login(reqDto)
                 saveAuthToken(context, result.data)
+
+                val token = readAuthToken(context)
+
+                //clientNum을 알 수 있는 방법 api를 이용해야 함
+                _id.value = 5
+
+                if (token == null){
+                    _errMsg.tryEmit("로그인 오류")
+                } else {
+                    _todoGroups.tryEmit(todoRepository.getGroups(id.value, token))
+                }
+
+                val tmpList = arrayListOf<Todo>()
+                todoGroups.value.forEach{
+                    tmpList.addAll(it.todoList)
+                }
+
+                _todos.tryEmit(tmpList)
             }
+
+            val tmp = mutableListOf<MyDate>()
+            calendar.dayList.forEach{
+                tmp.add(it)
+            }
+            _days.value = tmp
         }
+
     }
 
     //로그인 기능 x 테스트 용
     fun setClientNum(id : Int){
-//        login()
         runBlocking{
             viewModelScope.launch(Dispatchers.IO){
 
