@@ -21,6 +21,7 @@ import com.example.todolist.ui.screens.login.FindPasswdPage
 import com.example.todolist.ui.screens.todo.AddTodoPage
 import com.example.todolist.ui.screens.todo.DescriptionPage
 import com.example.todolist.ui.screens.todo.HomePage
+import com.example.todolist.ui.screens.todo.TodoGroupPage
 import com.example.todolist.ui.theme.TodoListTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -96,6 +97,15 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 todoViewModel = hiltViewModel(parentEntry),
                                 id = it.arguments?.getString("id") ?: throw NullPointerException("Id is NULL")
+                            )
+                        }
+                        composable(Screens.TodoGroupPage.name){
+                            val parentEntry = remember(it){
+                                navController.getBackStackEntry(Screens.LoginPage.name)
+                            }
+                            TodoGroupPage(
+                                navController = navController,
+                                todoViewModel = hiltViewModel(parentEntry)
                             )
                         }
                     }

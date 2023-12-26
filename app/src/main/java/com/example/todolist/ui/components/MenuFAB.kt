@@ -14,9 +14,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -37,17 +37,17 @@ fun MenuFAB(
     floatingIcon : ImageVector = Icons.Filled.Menu,
     menus : List<ImageVector> = listOf(
         Icons.Filled.AddCircle,
-        Icons.Filled.KeyboardArrowRight,
+        Icons.Filled.Send,
         Icons.Filled.KeyboardArrowUp
     ),
     insertTodo : () -> Unit,
-
+    insertTodoGroup : () -> Unit,
 ){
     var expanded by remember{mutableStateOf(false)}
 
     val onClicks : List<() -> Unit> = listOf(
         insertTodo,
-        {},
+        insertTodoGroup,
         {}
     )
 

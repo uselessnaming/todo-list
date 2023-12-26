@@ -213,7 +213,10 @@ fun HomePage(
             MenuFAB(
                 insertTodo = {
                     navController.navigate(Screens.AddTodoPage.name)
-                }
+                },
+                insertTodoGroup = {
+                    navController.navigate(Screens.TodoGroupPage.name)
+                },
             )
         }
     }

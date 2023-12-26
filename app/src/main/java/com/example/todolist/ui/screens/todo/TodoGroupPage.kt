@@ -21,30 +21,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.todolist.Data.DataClass.TodoGroupInTodo
 import com.example.todolist.Screens
+import com.example.todolist.ui.components.AddTodoGroupDialog
 import com.example.todolist.ui.components.TodoGroupItem
 import com.example.todolist.ui.components.TopBar
-import com.example.todolist.ui.theme.TodoListTheme
+import com.example.todolist.viewModel.TodoViewModel
 
 @Composable
 fun TodoGroupPage(
     navController: NavController,
-//    todoViewModel : TodoViewModel = hiltViewModel()
+    todoViewModel : TodoViewModel = hiltViewModel()
 ){
     val TAG = "TodoGroupPage"
 
     val todoGroups = listOf<TodoGroupInTodo>()
+
+    val configuration = LocalConfiguration.current
+    val width = configuration.screenWidthDp.dp
+    val height = configuration.screenHeightDp.dp
 
     var showDialog by remember{mutableStateOf(false)}
 
@@ -54,6 +59,18 @@ fun TodoGroupPage(
         ){
             append("Group을 추가하고 싶으시면 클릭해주세요")
         }
+    }
+
+    if (showDialog){
+        AddTodoGroupDialog(
+            onDismissRequest = {
+                showDialog = false
+            },
+            addGroup = {
+            },
+            width = (width / 5) * 4,
+            height = (height / 3),
+        )
     }
 
     Column(
@@ -85,9 +102,10 @@ fun TodoGroupPage(
                 }
             }
             Text(
-                modifier = Modifier.fillMaxWidth()
-                    .clickable{
-//                        showDialog = true
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        showDialog = true
                     },
                 text = annotatedText,
                 textAlign = TextAlign.Center,
@@ -95,13 +113,5 @@ fun TodoGroupPage(
                 color = Color.DarkGray
             )
         }
-    }
-}
-
-@Preview
-@Composable
-fun TestTodoGroupPage(){
-    TodoListTheme {
-        TodoGroupPage(navController = rememberNavController())
     }
 }
