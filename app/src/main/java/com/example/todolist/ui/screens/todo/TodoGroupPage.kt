@@ -114,7 +114,13 @@ fun TodoGroupPage(
                 items(todoGroups.value){
                     if (it.title != "No Group"){
                         TodoGroupItem(
-                            it
+                            todoGroup = it,
+                            onDeleteClick = {
+                                todoViewModel.delTodoGroup(it)
+                            },
+                            onDoneClick = {
+                                todoViewModel.updateTodoGroup(it)
+                            }
                         )
                     }
                 }

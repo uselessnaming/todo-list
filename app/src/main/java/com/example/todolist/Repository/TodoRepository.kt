@@ -117,4 +117,51 @@ class TodoRepository @Inject constructor(
             throw IllegalArgumentException(e.message)
         }
     }
+
+    //todo group 삭제
+    fun delTodoGroup(
+        token : String,
+        id : Int,
+        todoGroupNum : Int
+    ) : String {
+        try{
+            val result = todoApi.deleteTodoGroup(token, clientNum = id, todoGroupNum = todoGroupNum).execute()
+
+            return if (result.isSuccessful){
+                "삭제 성공"
+            } else {
+                "Error : ${result.code()}\n${result.errorBody()}"
+            }
+        } catch (e : Exception){
+            throw IllegalArgumentException(e.message)
+        }
+    }
+
+    //todo group 수정
+    fun updateTodoGroup(
+        token : String,
+        id : Int,
+        todoGroupNum : Int,
+        title : String,
+        isImportant : Boolean
+    ) : String {
+        try{
+            val newReqDto = TodoGroupReqDto(groupName = title, isImportant = isImportant)
+
+            val result = todoApi.updateTodoGroup(
+                token = token,
+//                clientNum = id,
+                todoGroupNum = todoGroupNum,
+                todoGroupReqDto = newReqDto
+            ).execute()
+
+            return if (result.isSuccessful){
+                "수정 성공"
+            } else {
+                "Error : ${result.code()}\n${result.errorBody()}"
+            }
+        } catch (e : Exception){
+            throw IllegalArgumentException(e.message)
+        }
+    }
 }

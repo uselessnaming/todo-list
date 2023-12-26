@@ -254,4 +254,50 @@ class TodoViewModel @Inject constructor(
             }
         }
     }
+
+    //todo group 삭제
+    fun delTodoGroup(todoGroup : TodoGroupInTodo){
+        val token = readAuthToken(context) ?: throw NullPointerException("Token is NULL on ${TAG} in delTodoGroup")
+        if (todoGroup.todoList[0].groupNum == -1){
+            _errMsg.value == "No Group은 삭제 불가능합니다."
+        } else {
+            runBlocking{
+                viewModelScope.launch(Dispatchers.IO){
+                    /** 정아한테 groupNum을 받는 Api를 통해서 데이터를 변경해줘야 함 */
+                    val resultMsg = todoRepository.delTodoGroup(token = token, id = id.value, todoGroupNum = todoGroup.todoList[0].groupNum)
+
+                    if (resultMsg != "삭제 성공") {
+                        _errMsg.value = resultMsg
+                    }
+                    _todoGroups.tryEmit(todoRepository.getGroups(id = id.value, token = token))
+                }
+            }
+        }
+    }
+
+    //todo group update
+    fun updateTodoGroup(todoGroup : TodoGroupInTodo){
+        val token = readAuthToken(context) ?: throw NullPointerException("Token is NULL on ${TAG} in updateTodoGroup")
+        if (todoGroup.todoList[0].groupNum == -1){
+            _errMsg.value == "No Group은 수정 불가능합니다."
+        } else {
+            runBlocking{
+                viewModelScope.launch(Dispatchers.IO){
+                    /** 정아한테 groupNum을 받는 Api를 통해서 데이터를 변경해줘야 함 */
+                    val resultMsg = todoRepository.updateTodoGroup(
+                        token = token,
+                        id = id.value,
+                        todoGroupNum = todoGroup.todoList[0].groupNum,
+                        title = todoGroup.title,
+                        isImportant = todoGroup.isImportant
+                    )
+
+                    if (resultMsg != "수정 성공") {
+                        _errMsg.value = resultMsg
+                    }
+                    _todoGroups.tryEmit(todoRepository.getGroups(id = id.value, token = token))
+                }
+            }
+        }
+    }
 }
