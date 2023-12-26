@@ -250,8 +250,8 @@ class TodoViewModel @Inject constructor(
                 if (resultMsg != "추가 성공") {
                     _errMsg.value = resultMsg
                 }
+                _todoGroups.tryEmit(todoRepository.getGroups(token = token, id = id.value))
             }
         }
-        fetchTodos(calendar.getToday()[0], todos.value)
     }
 }
