@@ -76,6 +76,7 @@ class TodoRepository @Inject constructor(
         val noTitleGroup = TodoGroupInTodo(
             todoList = noTitleTodos,
             title = "No Group",
+            groupNum = -1,
             isImportant = false
         )
         todoGroups.add(noTitleGroup)

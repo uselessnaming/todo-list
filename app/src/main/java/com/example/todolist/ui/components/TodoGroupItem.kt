@@ -1,10 +1,7 @@
 package com.example.todolist.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,12 +23,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.todolist.Data.DataClass.TodoGroupInTodo
-import com.example.todolist.Data.Todo
-import com.example.todolist.ui.theme.TodoListTheme
 
 @Composable
 fun TodoGroupItem(
@@ -116,31 +110,6 @@ fun TodoGroupItem(
                     contentDescription = "Delete Button"
                 )
             }
-        }
-    }
-}
-
-@Preview
-@Composable
-fun TestTodoGroupItem(){
-    TodoListTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color.White),
-            contentAlignment = Alignment.Center
-        ){
-            var isEditClicked by remember{mutableStateOf(false)}
-            var groupName by remember{ mutableStateOf("") }
-            TodoGroupItem(
-                todoGroup = TodoGroupInTodo(
-                    title = "테스트용",
-                    isImportant = false,
-                    todoList = listOf<Todo>()
-                ),
-                onDeleteClick = {},
-                onDoneClick = {}
-            )
         }
     }
 }

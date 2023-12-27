@@ -1,7 +1,6 @@
 package com.example.todolist.viewModel
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todolist.Data.Calendar.MyDate
@@ -119,47 +118,6 @@ class TodoViewModel @Inject constructor(
             }
             _days.value = tmp
         }
-
-    }
-
-    //로그인 기능 x 테스트 용
-    fun setClientNum(id : Int){
-        runBlocking{
-            viewModelScope.launch(Dispatchers.IO){
-
-                val reqDto = LoginRequestDto(
-                    clientId = "testtest",
-                    clientPassword = "q1w2e3r4t5@"
-                )
-                val result = repository.login(reqDto)
-                saveAuthToken(context, result.data)
-
-                _id.value = id
-                val token = readAuthToken(context)
-
-                Log.d(TAG, "login : ${token}")
-
-                if (token == null){
-                    _errMsg.tryEmit("로그인 정보가 없습니다.")
-                } else {
-                    _todoGroups.tryEmit(todoRepository.getGroups(id, token))
-                }
-
-                val tmpList = arrayListOf<Todo>()
-                todoGroups.value.forEach{
-                    tmpList.addAll(it.todoList)
-                }
-
-                _todos.tryEmit(tmpList)
-                Log.d(TAG, "todos : ${todos.value}")
-            }
-            val tmp = mutableListOf<MyDate>()
-            calendar.dayList.forEach{
-                tmp.add(it)
-            }
-            _days.value = tmp
-            Log.d(TAG, "days : ${days.value}")
-        }
     }
 
     //id를 통해서 Todo 객체 가져오기
@@ -224,7 +182,6 @@ class TodoViewModel @Inject constructor(
         location : String,
         todoGroup : TodoGroupInTodo
     ){
-        val groupNum =  if (todoGroup.title == "No Group") -1 else {todoGroup.todoList[0].groupNum}
         runBlocking{
             viewModelScope.launch(Dispatchers.IO){
                 val newReq = TodoReqDto(
@@ -232,7 +189,7 @@ class TodoViewModel @Inject constructor(
                     isFinished = false,
                     startDate = startDate,
                     desc = description,
-                    groupNum = groupNum,
+                    groupNum = todoGroup.groupNum,
                     location = location,
                     title = title
                 )
@@ -302,7 +259,7 @@ class TodoViewModel @Inject constructor(
     //todo group update
     fun updateTodoGroup(todoGroup : TodoGroupInTodo){
         val token = readAuthToken(context) ?: throw NullPointerException("Token is NULL on ${TAG} in updateTodoGroup")
-        if (todoGroup.todoList[0].groupNum == -1){
+        if (todoGroup.groupNum == -1){
             _errMsg.value == "No Group은 수정 불가능합니다."
         } else {
             runBlocking{
@@ -311,7 +268,7 @@ class TodoViewModel @Inject constructor(
                     val resultMsg = todoRepository.updateTodoGroup(
                         token = token,
                         id = id.value,
-                        todoGroupNum = todoGroup.todoList[0].groupNum,
+                        todoGroupNum = todoGroup.groupNum,
                         title = todoGroup.title,
                         isImportant = todoGroup.isImportant
                     )
@@ -319,6 +276,7 @@ class TodoViewModel @Inject constructor(
                     if (resultMsg != "수정 성공") {
                         _errMsg.value = resultMsg
                     }
+
                     _todoGroups.tryEmit(todoRepository.getGroups(id = id.value, token = token))
                 }
             }
