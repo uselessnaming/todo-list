@@ -4,10 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -33,15 +35,16 @@ fun TodoItem(
     onClick : () -> Unit,
 ){
     Row(
-        modifier = modifier.padding(10.dp)
-            .clickable{
+        modifier = modifier
+            .padding(10.dp)
+            .clickable {
                 onClick()
             },
         verticalAlignment = Alignment.CenterVertically
     ){
         //title
         Text(
-            modifier = Modifier.weight(6f),
+            modifier = Modifier.weight(4f),
             text = todo.title,
             fontSize = 26.sp,
             color = Black,
@@ -56,6 +59,8 @@ fun TodoItem(
             fontWeight = FontWeight(400)
         )
 
+        Spacer(Modifier.width(10.dp))
+
         IconButton(
             modifier = Modifier.size(26.dp),
             onClick = {
@@ -66,33 +71,6 @@ fun TodoItem(
                 imageVector = Icons.Filled.Star,
                 contentDescription = "isImportant",
                 tint = Yellow,
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-fun TestTodoItem(){
-    TodoListTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = White)
-        ){
-            TodoItem(
-                modifier = Modifier.fillMaxWidth(),
-                todo = Todo(
-                    startDate = "2023.12.06",
-                    deadDate = "2023.12.25",
-                    isFinished = false,
-                    description = "산타할아버지~",
-                    groupNum = 0,
-                    location = "집",
-                    title = "눈싸움 하기",
-                    todoNum = 1
-                ),
-                onClick = {}
             )
         }
     }

@@ -1,7 +1,6 @@
 package com.example.todolist.viewModel
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todolist.Data.Calendar.MyDate
@@ -47,11 +46,6 @@ class TodoViewModel @Inject constructor(
     private val _errMsg = MutableStateFlow<String?>(null)
     val errMsg : StateFlow<String?>
         get() = _errMsg
-
-    //login 정보
-    private val _isLogin = MutableStateFlow<Boolean>(false)
-    val isLogin : StateFlow<Boolean>
-        get() = _isLogin
 
     //error msg 관리
     private val _okMsg = MutableStateFlow<String?>(null)
@@ -140,17 +134,17 @@ class TodoViewModel @Inject constructor(
             //초기 todos
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
             val todayFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA)
-            val stdToday = todayFormat.parse(getToday()[0]) ?: throw NullPointerException("Today is NULL on ${TAG} in fatchTodos()")
+            val stdToday = todayFormat.parse(getToday()[0]) ?: throw NullPointerException("Today is NULL on ${TAG} in fetchTodos()")
 
             val tmp_list = mutableListOf<Todo>()
             todos.value.forEach{
-                val day = dateFormat.parse(it.deadDate) ?: throw NullPointerException("Today is NULL on ${TAG} in fatchTodos()")
-                if (day > stdToday){
+                val deadDate = dateFormat.parse(it.deadDate) ?: throw NullPointerException("Today is NULL on ${TAG} in fetchTodos()")
+                val startDate = dateFormat.parse(it.startDate) ?: throw NullPointerException("Today is NULL on ${TAG} in fetchTodos()")
+                if (stdToday in startDate..deadDate){
                     tmp_list.add(it)
                 }
             }
             _todosByDate.tryEmit(tmp_list)
-            _isLogin.tryEmit(true)
             return@async "Done"
         }.await()
 
@@ -241,7 +235,6 @@ class TodoViewModel @Inject constructor(
                 }
                 //data fetch
                 _todoGroups.tryEmit(todoRepository.getGroups(token))
-                Log.d(TAG, "addTodo : ${todoGroups.value}")
             }
         }
     }
@@ -254,12 +247,12 @@ class TodoViewModel @Inject constructor(
 
             val result = mutableListOf<Todo>()
             todos.value.forEach{
-                val day = dateFormat.parse(it.deadDate) ?: throw NullPointerException("Today is NULL on ${TAG} in fatchTodos()")
-                if (day > stdToday){
+                val deadDate = dateFormat.parse(it.deadDate) ?: throw NullPointerException("Today is NULL on ${TAG} in fatchTodos()")
+                val startDate = dateFormat.parse(it.startDate) ?: throw NullPointerException("Today is NULL on ${TAG} in fetchTodos()")
+                if (stdToday in startDate..deadDate){
                     result.add(it)
                 }
             }
-            Log.d(TAG, "fetch todos : ${result}")
             _todosByDate.tryEmit(result)
         }
     }

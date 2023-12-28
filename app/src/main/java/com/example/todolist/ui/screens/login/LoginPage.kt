@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.todolist.Data.showToast
+import com.example.todolist.ui.components.LoadingDialog
 import com.example.todolist.ui.theme.MainColor
 import com.example.todolist.viewModel.TodoViewModel
 import kotlinx.coroutines.Dispatchers
@@ -56,9 +58,22 @@ fun LoginPage(
     var passwd by remember{mutableStateOf("")}
 
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val width = configuration.screenWidthDp.dp
+    val height = configuration.screenHeightDp.dp
 
     //coroutineScope
     val coroutineScope = rememberCoroutineScope()
+
+    var showDialog by remember{mutableStateOf(false)}
+
+    if (showDialog){
+        LoadingDialog(
+            onDismissRequest = { showDialog = false },
+            width = width / 4,
+            height = height / 10
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -142,6 +157,7 @@ fun LoginPage(
             onClick = {
                 //id와 passwd가 있을 경우
                 if(id.isNotEmpty() && passwd.isNotEmpty()){
+                    showDialog = true
                     coroutineScope.launch(Dispatchers.IO){
                         val tmp = todoViewModel.login(userId = id, userPasswd = passwd)
                         withContext(Dispatchers.Main){
