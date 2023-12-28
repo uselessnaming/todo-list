@@ -42,11 +42,6 @@ class TodoViewModel @Inject constructor(
     val isLogin : StateFlow<Boolean>
         get() = _isLogin
 
-    //로그인한 유저의 id 관리
-    private val _id = MutableStateFlow(0)
-    val id : StateFlow<Int>
-        get() = _id
-
     //dayList
     private val _days = MutableStateFlow(listOf<MyDate>())
     val days : StateFlow<List<MyDate>>
@@ -76,7 +71,6 @@ class TodoViewModel @Inject constructor(
     //로그아웃
     fun logout(){
         _isLogin.value = false
-        _id.value = -1
         saveAuthToken(context, null)
     }
 
@@ -95,13 +89,10 @@ class TodoViewModel @Inject constructor(
 
                 val token = readAuthToken(context)
 
-                //clientNum을 알 수 있는 방법 api를 이용해야 함
-                _id.value = 5
-
                 if (token == null){
                     _errMsg.tryEmit("로그인 오류")
                 } else {
-                    _todoGroups.tryEmit(todoRepository.getGroups(id.value, token))
+                    _todoGroups.tryEmit(todoRepository.getGroups(token))
                 }
 
                 val tmpList = arrayListOf<Todo>()
@@ -195,10 +186,10 @@ class TodoViewModel @Inject constructor(
                 )
                 val token = readAuthToken(context) ?: throw NullPointerException("Token Data is NULL on ${TAG} in AddTodo()")
                 //data 추가
-                todoRepository.addTodo(token, id.value, newReq)
+                todoRepository.addTodo(token, newReq)
 
                 //data fetch
-                _todoGroups.tryEmit(todoRepository.getGroups(id.value, token))
+                _todoGroups.tryEmit(todoRepository.getGroups(token))
             }
         }
     }
@@ -227,11 +218,11 @@ class TodoViewModel @Inject constructor(
         val token = readAuthToken(context) ?: throw NullPointerException("Token is NULL on ${TAG} in addTodoGroup")
         runBlocking{
             viewModelScope.launch(Dispatchers.IO){
-                val resultMsg = todoRepository.addTodoGroup(token, id.value, title)
+                val resultMsg = todoRepository.addTodoGroup(token, title)
                 if (resultMsg != "추가 성공") {
                     _errMsg.value = resultMsg
                 }
-                _todoGroups.tryEmit(todoRepository.getGroups(token = token, id = id.value))
+                _todoGroups.tryEmit(todoRepository.getGroups(token = token))
             }
         }
     }
@@ -245,12 +236,12 @@ class TodoViewModel @Inject constructor(
             runBlocking{
                 viewModelScope.launch(Dispatchers.IO){
                     /** 정아한테 groupNum을 받는 Api를 통해서 데이터를 변경해줘야 함 */
-                    val resultMsg = todoRepository.delTodoGroup(token = token, id = id.value, todoGroupNum = todoGroup.todoList[0].groupNum)
+                    val resultMsg = todoRepository.delTodoGroup(token = token, todoGroupNum = todoGroup.todoList[0].groupNum)
 
                     if (resultMsg != "삭제 성공") {
                         _errMsg.value = resultMsg
                     }
-                    _todoGroups.tryEmit(todoRepository.getGroups(id = id.value, token = token))
+                    _todoGroups.tryEmit(todoRepository.getGroups(token = token))
                 }
             }
         }
@@ -267,7 +258,6 @@ class TodoViewModel @Inject constructor(
                     /** 정아한테 groupNum을 받는 Api를 통해서 데이터를 변경해줘야 함 */
                     val resultMsg = todoRepository.updateTodoGroup(
                         token = token,
-                        id = id.value,
                         todoGroupNum = todoGroup.groupNum,
                         title = todoGroup.title,
                         isImportant = todoGroup.isImportant
@@ -277,7 +267,7 @@ class TodoViewModel @Inject constructor(
                         _errMsg.value = resultMsg
                     }
 
-                    _todoGroups.tryEmit(todoRepository.getGroups(id = id.value, token = token))
+                    _todoGroups.tryEmit(todoRepository.getGroups(token = token))
                 }
             }
         }

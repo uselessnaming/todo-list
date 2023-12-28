@@ -12,12 +12,12 @@ class TodoRepository @Inject constructor(
     val TAG = "TodoRepository"
     
     //id를 기반으로 Todo 정보들을 가져옴
-    fun getTodos(token: String, id : Int) : List<Todo>{
+    fun getTodos(token: String) : List<Todo>{
         val todoList = ArrayList<Todo>()
 
         //Todo Group이 있는 Todo List들을 우선 삽입
         try{
-            val result = todoApi.getAllTodosInGroup(token, id).execute()
+            val result = todoApi.getAllTodosInGroup(token).execute()
             if (result.isSuccessful){
                 val response = result.body() ?: throw NullPointerException("Error : Data is NULL in ${TAG} / getTodos()")
                 val data = response.data
@@ -34,12 +34,12 @@ class TodoRepository @Inject constructor(
         return todoList
     }
 
-    fun getGroups(id : Int, token : String) : List<TodoGroupInTodo>{
+    fun getGroups(token : String) : List<TodoGroupInTodo>{
         val todoGroups = arrayListOf<TodoGroupInTodo>()
 
         //group이 있는 Todo
         try{
-            val result = todoApi.getAllTodosInGroup(token, id).execute()
+            val result = todoApi.getAllTodosInGroup(token).execute()
             if (result.isSuccessful){
                 val response = result.body() ?: throw NullPointerException("Error : Data is NULL in getGroups() / ${TAG}")
 
@@ -55,7 +55,7 @@ class TodoRepository @Inject constructor(
 
         //group이 없는 todo
         try{
-            val result = todoApi.getTodosNoGroup(token, id).execute()
+            val result = todoApi.getTodosNoGroup(token).execute()
             if (result.isSuccessful){
                 val response = result.body() ?: throw NullPointerException("Error : Data is NULL in ${TAG} / getTodos()")
                 val data = response.data
@@ -85,9 +85,9 @@ class TodoRepository @Inject constructor(
     }
 
     //Todo 추가
-    fun addTodo(token : String, clientNum : Int, todoReq : TodoReqDto) : String{
+    fun addTodo(token : String, todoReq : TodoReqDto) : String{
         try {
-            val result = todoApi.addTodo(token, clientNum, todoReq).execute()
+            val result = todoApi.addTodo(token, todoReq).execute()
 
             return if (result.isSuccessful){
                 "추가 성공"
@@ -100,14 +100,14 @@ class TodoRepository @Inject constructor(
     }
 
     //todo group 추가
-    fun addTodoGroup(token : String, id : Int, title : String) : String {
+    fun addTodoGroup(token : String, title : String) : String {
         try{
             val newReqDto = TodoGroupReqDto(
                 groupName = title,
                 isImportant = false
             )
 
-            val result = todoApi.addTodoGroup(token, clientNum = id, todoGroupReqDto = newReqDto).execute()
+            val result = todoApi.addTodoGroup(token = token, todoGroupReqDto = newReqDto).execute()
 
             return if (result.isSuccessful){
                 "추가 성공"
@@ -122,11 +122,10 @@ class TodoRepository @Inject constructor(
     //todo group 삭제
     fun delTodoGroup(
         token : String,
-        id : Int,
         todoGroupNum : Int
     ) : String {
         try{
-            val result = todoApi.deleteTodoGroup(token, clientNum = id, todoGroupNum = todoGroupNum).execute()
+            val result = todoApi.deleteTodoGroup(token = token, todoGroupNum = todoGroupNum).execute()
 
             return if (result.isSuccessful){
                 "삭제 성공"
@@ -141,7 +140,6 @@ class TodoRepository @Inject constructor(
     //todo group 수정
     fun updateTodoGroup(
         token : String,
-        id : Int,
         todoGroupNum : Int,
         title : String,
         isImportant : Boolean
@@ -151,7 +149,6 @@ class TodoRepository @Inject constructor(
 
             val result = todoApi.updateTodoGroup(
                 token = token,
-//                clientNum = id,
                 todoGroupNum = todoGroupNum,
                 todoGroupReqDto = newReqDto
             ).execute()
