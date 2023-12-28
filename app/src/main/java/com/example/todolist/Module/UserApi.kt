@@ -3,8 +3,8 @@ package com.example.todolist.Module
 import com.example.todolist.Data.LoginDto.CommonUserRespDto
 import com.example.todolist.Data.LoginDto.GetAllRespDto
 import com.example.todolist.Data.LoginDto.LoginRequestDto
+import com.example.todolist.Data.LoginDto.SignUpReqDto
 import com.example.todolist.Data.LoginDto.UpdateUserReqDto
-import com.example.todolist.Data.LoginDto.User
 import com.example.todolist.Data.SignUpRespDto
 import retrofit2.Call
 import retrofit2.http.Body
@@ -26,7 +26,7 @@ interface UserApi {
 
     //회원 가입
     @POST("/clients/sign-up")
-    fun addUser(@Body requestClientDto : User) : Call<SignUpRespDto>
+    fun addUser(@Body requestClientDto : SignUpReqDto) : Call<SignUpRespDto>
 
     //회원 탈퇴
     @DELETE("/clients")

@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.todolist.Data.Calendar.MyDate
 import com.example.todolist.Data.DataClass.TodoGroupInTodo
 import com.example.todolist.Data.LoginDto.LoginRequestDto
-import com.example.todolist.Data.LoginDto.User
+import com.example.todolist.Data.LoginDto.SignUpReqDto
 import com.example.todolist.Data.Todo
 import com.example.todolist.Data.TodoDto.TodoReqDto
 import com.example.todolist.Data.readAuthToken
@@ -17,7 +17,6 @@ import com.example.todolist.Module.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -51,6 +50,10 @@ class TodoViewModel @Inject constructor(
     private val _errMsg = MutableStateFlow<String?>(null)
     val errMsg : StateFlow<String?> = _errMsg
 
+    //error msg 관리
+    private val _okMsg = MutableStateFlow<String?>(null)
+    val okMsg : StateFlow<String?> = _okMsg
+
     //현재 유저의 Todo List
     private val _todos = MutableStateFlow(mutableListOf<Todo>())
     val todos : StateFlow<List<Todo>>
@@ -61,12 +64,32 @@ class TodoViewModel @Inject constructor(
     val todoGroups : StateFlow<List<TodoGroupInTodo>>
         get() = _todoGroups
 
-    suspend fun signUp(signUpReqDto : User) =
-        viewModelScope.async(Dispatchers.IO){
-            val result = repository.signUp(signUpReqDto)
-
-            return@async result.result
-        }.await()
+    fun signUp(
+        id : String,
+        passwd : String,
+        email : String,
+        name : String,
+        phoneNum : String,
+    ) {
+        runBlocking{
+            viewModelScope.launch(Dispatchers.IO){
+                val newReqDto = SignUpReqDto(
+                    id = id,
+                    passwd = passwd,
+                    clientEmail = email,
+                    name = name,
+                    phoneNum = phoneNum
+                )
+                val result = repository.signUp(newReqDto)
+                
+                if (result != "회원가입 성공" && result != "OK"){
+                    _errMsg.value = result
+                } else {
+                    _okMsg.value = result
+                }
+            }
+        }
+    }
 
     //로그아웃
     fun logout(){
