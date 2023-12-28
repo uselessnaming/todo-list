@@ -10,9 +10,9 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Path
 
 interface UserApi {
 
@@ -21,16 +21,16 @@ interface UserApi {
     fun getAllUsers() : Call<GetAllRespDto>
 
     //유저 회원 정보 수정
-    @PUT("/clients/{clientnum}")
-    fun updateUser(@Path("clientnum") clientNum : Int,@Body signUpReqDto : UpdateUserReqDto) : Call<SignUpRespDto>
+    @PUT("/clients")
+    fun updateUser(@Header("X-AUTH-TOKEN") token : String, @Body signUpReqDto : UpdateUserReqDto) : Call<SignUpRespDto>
 
     //회원 가입
     @POST("/clients/sign-up")
     fun addUser(@Body requestClientDto : User) : Call<SignUpRespDto>
 
     //회원 탈퇴
-    @DELETE("/clients/{clientnum}")
-    fun deleteUser(@Path("clientnum") clientNum : Int) : Call<CommonUserRespDto>
+    @DELETE("/clients")
+    fun deleteUser(@Header("X-AUTH-TOKEN") token : String) : Call<CommonUserRespDto>
 
     //로그인
     @POST("/clients/sign-in")
