@@ -1,7 +1,7 @@
 package com.example.todolist.ui.screens.todo
 
 import android.app.Activity
-import android.widget.Toast
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -67,7 +67,7 @@ fun HomePage(
     val screenWidth = configuration.screenWidthDp.dp
 
     //todos
-    val todos = todoViewModel.todos.collectAsState()
+    val todos = todoViewModel.todosByDate.collectAsState()
 
     //뒤로가기 클릭 여부
     var backPressed by remember{mutableStateOf(false)}
@@ -222,13 +222,14 @@ fun HomePage(
     }
     LaunchedEffect(errorState.value){
         if (errorState.value != null){
-            Toast.makeText(context, "${errorState.value}\n다시 로그인 해주세요", Toast.LENGTH_SHORT).show()
+            showToast(context, "${errorState.value}\n다시 로그인 해주세요")
+            todoViewModel.resultReset()
             navController.navigate(Screens.LoginPage.name)
-            todoViewModel.resetErrMsg()
         }
     }
-    LaunchedEffect(selectedDay){
-        val dateString = "${selectedDay.value.year}년 ${selectedDay.value.month}월 ${selectedDay.value.day}일"
-        todoViewModel.fetchTodos(dateString, todos.value)
+    LaunchedEffect(selectedDay.value){
+        val dateString = "${selectedDay.value.year}-${selectedDay.value.month}-${selectedDay.value.day}"
+        todoViewModel.fetchTodos(dateString)
+        Log.d(TAG, "fetch result : ${todos.value}")
     }
 }

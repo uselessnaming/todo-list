@@ -1,6 +1,7 @@
 package com.example.todolist.viewModel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todolist.Data.Calendar.MyDate
@@ -17,6 +18,7 @@ import com.example.todolist.Module.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -36,11 +38,6 @@ class TodoViewModel @Inject constructor(
     //달력 모듈
     val calendar = MyCalendar()
 
-    //로그인 상태 유지
-    private val _isLogin = MutableStateFlow(false)
-    val isLogin : StateFlow<Boolean>
-        get() = _isLogin
-
     //dayList
     private val _days = MutableStateFlow(listOf<MyDate>())
     val days : StateFlow<List<MyDate>>
@@ -48,16 +45,28 @@ class TodoViewModel @Inject constructor(
 
     //error msg 관리
     private val _errMsg = MutableStateFlow<String?>(null)
-    val errMsg : StateFlow<String?> = _errMsg
+    val errMsg : StateFlow<String?>
+        get() = _errMsg
+
+    //login 정보
+    private val _isLogin = MutableStateFlow<Boolean>(false)
+    val isLogin : StateFlow<Boolean>
+        get() = _isLogin
 
     //error msg 관리
     private val _okMsg = MutableStateFlow<String?>(null)
-    val okMsg : StateFlow<String?> = _okMsg
+    val okMsg : StateFlow<String?>
+        get() = _okMsg
 
     //현재 유저의 Todo List
     private val _todos = MutableStateFlow(mutableListOf<Todo>())
     val todos : StateFlow<List<Todo>>
         get() = _todos
+
+    //날짜로 관리되는 Todo List
+    private val _todosByDate = MutableStateFlow(mutableListOf<Todo>())
+    val todosByDate : StateFlow<List<Todo>>
+        get() = _todosByDate
 
     //현재 유저의 Todo Group List
     private val _todoGroups = MutableStateFlow(listOf<TodoGroupInTodo>())
@@ -83,9 +92,9 @@ class TodoViewModel @Inject constructor(
                 val result = repository.signUp(newReqDto)
                 
                 if (result != "회원가입 성공" && result != "OK"){
-                    _errMsg.value = result
+                    _errMsg.tryEmit(result)
                 } else {
-                    _okMsg.value = result
+                    _okMsg.tryEmit(result)
                 }
             }
         }
@@ -93,46 +102,58 @@ class TodoViewModel @Inject constructor(
 
     //로그아웃
     fun logout(){
-        _isLogin.value = false
         saveAuthToken(context, null)
     }
 
     fun getToday() = calendar.getToday()
 
     //로그인 테스트
-    fun login(userId : String, userPasswd : String){
-        runBlocking{
-            viewModelScope.launch(Dispatchers.IO){
-                val reqDto = LoginRequestDto(
-                    clientId = userId,
-                    clientPassword = userPasswd
-                )
-                val result = repository.login(reqDto)
-                saveAuthToken(context, result.data)
+    suspend fun login(userId : String, userPasswd : String) : String =
+        viewModelScope.async(Dispatchers.IO){
+            val reqDto = LoginRequestDto(
+                clientId = userId,
+                clientPassword = userPasswd
+            )
+            val result = repository.login(reqDto)
 
-                val token = readAuthToken(context)
-
-                if (token == null){
-                    _errMsg.tryEmit("로그인 오류")
-                } else {
-                    _todoGroups.tryEmit(todoRepository.getGroups(token))
-                }
-
-                val tmpList = arrayListOf<Todo>()
-                todoGroups.value.forEach{
-                    tmpList.addAll(it.todoList)
-                }
-
-                _todos.tryEmit(tmpList)
+            if (result == "로그인 실패"){
+                _errMsg.tryEmit("로그인 실패")
+            } else {
+                saveAuthToken(context, result)
+                _todoGroups.tryEmit(todoRepository.getGroups(result))
             }
+
+            val tmpList = arrayListOf<Todo>()
+            todoGroups.value.forEach{
+                tmpList.addAll(it.todoList)
+            }
+
+            _todos.tryEmit(tmpList)
+
 
             val tmp = mutableListOf<MyDate>()
             calendar.dayList.forEach{
                 tmp.add(it)
             }
-            _days.value = tmp
-        }
-    }
+            _days.tryEmit(tmp)
+
+            //초기 todos
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
+            val todayFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA)
+            val stdToday = todayFormat.parse(getToday()[0]) ?: throw NullPointerException("Today is NULL on ${TAG} in fatchTodos()")
+
+            val tmp_list = mutableListOf<Todo>()
+            todos.value.forEach{
+                val day = dateFormat.parse(it.deadDate) ?: throw NullPointerException("Today is NULL on ${TAG} in fatchTodos()")
+                if (day > stdToday){
+                    tmp_list.add(it)
+                }
+            }
+            _todosByDate.tryEmit(tmp_list)
+            _isLogin.tryEmit(true)
+            return@async "Done"
+        }.await()
+
 
     //id를 통해서 Todo 객체 가져오기
     fun getTodoById(id : String) : Todo {
@@ -157,7 +178,7 @@ class TodoViewModel @Inject constructor(
             tmp.add(it)
         }
 
-        _days.value = tmp
+        _days.tryEmit(tmp)
     }
 
     //전 주로 이동
@@ -169,7 +190,7 @@ class TodoViewModel @Inject constructor(
             tmp.add(it)
         }
 
-        _days.value = tmp
+        _days.tryEmit(tmp)
     }
 
     //selectedDate를 반환
@@ -183,8 +204,9 @@ class TodoViewModel @Inject constructor(
     }
 
     //errMsg 초기화
-    fun resetErrMsg(){
+    fun resultReset(){
         _errMsg.value = null
+        _okMsg.value = null
     }
 
     //todo추가
@@ -196,12 +218,14 @@ class TodoViewModel @Inject constructor(
         location : String,
         todoGroup : TodoGroupInTodo
     ){
+        val newStartDate = startDate.substring(0,4) + "-" + startDate.substring(6,8) + "-" + startDate.substring(10,12)
+        val newEndDate = endDate.substring(0,4) + "-" + endDate.substring(6,8) + "-" + endDate.substring(10,12)
         runBlocking{
             viewModelScope.launch(Dispatchers.IO){
                 val newReq = TodoReqDto(
-                    endDate = endDate,
+                    endDate = newEndDate,
                     isFinished = false,
-                    startDate = startDate,
+                    startDate = newStartDate,
                     desc = description,
                     groupNum = todoGroup.groupNum,
                     location = location,
@@ -209,28 +233,34 @@ class TodoViewModel @Inject constructor(
                 )
                 val token = readAuthToken(context) ?: throw NullPointerException("Token Data is NULL on ${TAG} in AddTodo()")
                 //data 추가
-                todoRepository.addTodo(token, newReq)
-
+                val result = todoRepository.addTodo(token, newReq)
+                if (result == "추가 성공"){
+                    _okMsg.tryEmit("추가 성공")
+                } else {
+                    _okMsg.tryEmit(result)
+                }
                 //data fetch
                 _todoGroups.tryEmit(todoRepository.getGroups(token))
+                Log.d(TAG, "addTodo : ${todoGroups.value}")
             }
         }
     }
 
     //데이터 갱신
-    fun fetchTodos(date : String, todos : List<Todo>){
+    fun fetchTodos(date : String){
         runBlocking {
-            val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA)
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
             val stdToday = dateFormat.parse(date) ?: throw NullPointerException("Today is NULL on ${TAG} in fatchTodos()")
 
             val result = mutableListOf<Todo>()
-            todos.forEach{
+            todos.value.forEach{
                 val day = dateFormat.parse(it.deadDate) ?: throw NullPointerException("Today is NULL on ${TAG} in fatchTodos()")
-                if (day.compareTo(stdToday) > 0){
+                if (day > stdToday){
                     result.add(it)
                 }
             }
-            _todos.tryEmit(result)
+            Log.d(TAG, "fetch todos : ${result}")
+            _todosByDate.tryEmit(result)
         }
     }
 

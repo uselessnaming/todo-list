@@ -31,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,18 +42,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.todolist.Data.DataClass.TodoGroupInTodo
+import com.example.todolist.Data.showToast
 import com.example.todolist.Screens
 import com.example.todolist.ui.components.CustomDatePicker
 import com.example.todolist.ui.components.TimePickerDialog
 import com.example.todolist.ui.components.TopBar
-import com.example.todolist.ui.theme.TodoListTheme
 import com.example.todolist.viewModel.TodoViewModel
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -124,12 +125,26 @@ fun AddTodoPage(
 
     val todoGroups = todoViewModel.todoGroups.collectAsState()
 
-    var selectedGroup = remember{mutableStateOf(todoGroups.value[0])}
+    var selectedGroup = remember{
+        val group = mutableStateOf(
+            if (todoGroups.value.isEmpty()){
+                TodoGroupInTodo(-1, "No Group", false, listOf())
+            } else {
+                todoGroups.value[0]
+            }
+        )
+        group
+    }
 
     var isExpanded by remember{mutableStateOf(false)}
     val onDropdownMenu = {
         isExpanded = !isExpanded
     }
+
+    val errMsg = todoViewModel.errMsg.collectAsState()
+    val okMsg = todoViewModel.okMsg.collectAsState()
+
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -254,7 +269,8 @@ fun AddTodoPage(
                         .height(55.dp)
                 ){
                     Column(
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
                             .fillMaxHeight(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ){
@@ -265,7 +281,8 @@ fun AddTodoPage(
                     }
 
                     Column(
-                        modifier = Modifier.weight(5f)
+                        modifier = Modifier
+                            .weight(5f)
                             .fillMaxHeight(),
                         verticalArrangement = Arrangement.Center
                     ){
@@ -297,8 +314,9 @@ fun AddTodoPage(
                             ) {
                                 todoGroups.value.forEach{
                                     Text(
-                                        modifier = Modifier.fillMaxWidth()
-                                            .clickable{
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
                                                 selectedGroup.value = it
                                                 onDropdownMenu()
                                             },
@@ -515,8 +533,8 @@ fun AddTodoPage(
                         onClick = {
                             //추가
                             todoViewModel.addTodo(
-                                startDate = startDate + " ${selectedStartAmPm} ${selectedStartHour}시 ${selectedStartMinutes}분",
-                                endDate = endDate + " ${selectedEndAmPm} ${selectedEndHour}시 ${selectedEndMinutes}분",
+                                startDate = startDate,
+                                endDate = endDate,
                                 description = content,
                                 location = loc,
                                 title = title,
@@ -537,21 +555,12 @@ fun AddTodoPage(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun TestAddTodoPage(){
-    TodoListTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color.White)
-        ){
-            AddTodoPage(
-                navController = rememberNavController(),
-                todoViewModel = hiltViewModel()
-            )
+    LaunchedEffect(errMsg.value, okMsg.value){
+        if (errMsg.value != null) {
+            showToast(context, errMsg.value!!)
+        } else if (okMsg.value != null) {
+            showToast(context, okMsg.value!!)
         }
+        todoViewModel.resultReset()
     }
 }

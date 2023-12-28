@@ -1,6 +1,5 @@
 package com.example.todolist
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -18,7 +17,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +40,9 @@ import androidx.navigation.NavController
 import com.example.todolist.Data.showToast
 import com.example.todolist.ui.theme.MainColor
 import com.example.todolist.viewModel.TodoViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,10 +56,6 @@ fun LoginPage(
     var passwd by remember{mutableStateOf("")}
 
     val context = LocalContext.current
-
-    //login 상태
-    val isLogin = todoViewModel.isLogin.collectAsState()
-    Log.d(TAG, "isLogin : ${isLogin}")
 
     //coroutineScope
     val coroutineScope = rememberCoroutineScope()
@@ -145,9 +142,12 @@ fun LoginPage(
             onClick = {
                 //id와 passwd가 있을 경우
                 if(id.isNotEmpty() && passwd.isNotEmpty()){
-                    todoViewModel.login(userId = id, userPasswd = passwd)
-                    //임시 홈페이지 이동
-                    navController.navigate(Screens.HomePage.name)
+                    coroutineScope.launch(Dispatchers.IO){
+                        val tmp = todoViewModel.login(userId = id, userPasswd = passwd)
+                        withContext(Dispatchers.Main){
+                            navController.navigate(Screens.HomePage.name)
+                        }
+                    }
                 }
                 //id와 passwd가 없을 경우
                 else {

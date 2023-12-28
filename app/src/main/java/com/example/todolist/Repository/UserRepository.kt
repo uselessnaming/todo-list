@@ -1,6 +1,5 @@
 package com.example.todolist.Module
 
-import com.example.todolist.Data.LoginDto.CommonUserRespDto
 import com.example.todolist.Data.LoginDto.LoginRequestDto
 import com.example.todolist.Data.LoginDto.SignUpReqDto
 import javax.inject.Inject
@@ -34,18 +33,22 @@ class UserRepository @Inject constructor(
     }
 
     //로그인
-    fun login(loginRequestDto: LoginRequestDto) : CommonUserRespDto {
+    fun login(loginRequestDto: LoginRequestDto) : String {
         try {
-            val call = userApi.login(loginRequestDto)
+            val response = userApi.login(loginRequestDto).execute()
 
-            val response = call.execute()
-            return if (response.isSuccessful) {
-                when (response.code()) {
-                    200 -> response.body() ?: throw NullPointerException("Data is NULL")
-                    else -> throw NullPointerException("서버 오류 : ${response.code()}")
-                }
+            val result = response.body()
+            return if (result == null){
+                "데이터가 없습니다."
             } else {
-                throw Exception("서버 오류 : ${response.code()}")
+                if (response.isSuccessful) {
+                    when (response.code()) {
+                        200 -> result.data
+                        else -> "로그인 실패"
+                    }
+                } else {
+                    "로그인 실패"
+                }
             }
         } catch(e : Exception){
             throw IllegalArgumentException("서버 오류 : ${e.message}")
