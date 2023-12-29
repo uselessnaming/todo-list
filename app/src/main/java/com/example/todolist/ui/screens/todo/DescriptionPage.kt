@@ -55,9 +55,7 @@ fun DescriptionPage(
                 navController.navigateUp()
             },
             actionIcon = Icons.Filled.Edit,
-            onActionClick = {
-//                navController.navigate(Screens.EditTodoPage.name)
-            }
+            onActionClick = { }
         )
         Column(
             modifier = Modifier
@@ -106,7 +104,8 @@ fun DescriptionPage(
 
                 ){
                     Text(
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
                             .background(color = Color.LightGray, shape = RoundedCornerShape(25.dp)),
                         text = todo.startDate.substring(5),
                         color = Color.Black,
@@ -122,7 +121,8 @@ fun DescriptionPage(
                     )
 
                     Text(
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
                             .background(color = Color.LightGray, shape = RoundedCornerShape(25.dp)),
                         text = todo.deadDate.substring(5),
                         color = Color.Black,

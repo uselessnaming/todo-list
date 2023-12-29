@@ -41,7 +41,8 @@ fun WeekCalendar(
     onValueChanged : (MyDate) -> Unit,
     items : List<MyDate>,
     onSlideNext : () -> Unit,
-    onSlidePrev : () -> Unit
+    onSlidePrev : () -> Unit,
+    todoNumList : List<Int>
 ){
     //day list
     val dayList = listOf("일","월","화","수","목","금","토")
@@ -128,7 +129,7 @@ fun WeekCalendar(
                     ){
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = "0",
+                            text = "${todoNumList[i]}",
                             fontSize = 16.sp,
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight(600)

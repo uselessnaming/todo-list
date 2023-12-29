@@ -42,6 +42,11 @@ class TodoViewModel @Inject constructor(
     val days : StateFlow<List<MyDate>>
         get() = _days
 
+    //이번 주 포함 투두 개수 리스트
+    private val _todosByDateList = MutableStateFlow(listOf<Int>())
+    val todosByDateList : StateFlow<List<Int>>
+        get() = _todosByDateList
+
     //error msg 관리
     private val _errMsg = MutableStateFlow<String?>(null)
     val errMsg : StateFlow<String?>
@@ -190,6 +195,25 @@ class TodoViewModel @Inject constructor(
     //selectedDate를 반환
     fun getSelectedDay() : MyDate{
         return calendar.selectedMyDate
+    }
+
+    //오늘을 포함하는 이번 주의 todo 개수
+    fun getTodoNumByDate(){
+        val todoByDateList = mutableListOf<Int>()
+        calendar.dayList.forEach{ date ->
+            var cnt = 0
+            todos.value.forEach{ todo ->
+                val formatDate = (date.year).toString() + "-" + (date.month).toString() + "-" + (date.day).toString()
+                val newStartDate = todo.startDate
+                val newEndDate = todo.deadDate
+
+                if (formatDate in newStartDate..newEndDate){
+                    cnt += 1
+                }
+            }
+            todoByDateList.add(cnt)
+        }
+        _todosByDateList.tryEmit(todoByDateList)
     }
 
     //selectedDate를 설정

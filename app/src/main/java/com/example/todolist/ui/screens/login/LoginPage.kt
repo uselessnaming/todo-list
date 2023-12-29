@@ -69,7 +69,9 @@ fun LoginPage(
 
     if (showDialog){
         LoadingDialog(
-            onDismissRequest = { showDialog = false },
+            onDismissRequest = {
+                showDialog = false
+            },
             width = width / 4,
             height = height / 10
         )
@@ -160,6 +162,7 @@ fun LoginPage(
                     showDialog = true
                     coroutineScope.launch(Dispatchers.IO){
                         val tmp = todoViewModel.login(userId = id, userPasswd = passwd)
+                        todoViewModel.getTodoNumByDate()
                         withContext(Dispatchers.Main){
                             navController.navigate(Screens.HomePage.name)
                         }

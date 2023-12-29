@@ -1,7 +1,6 @@
 package com.example.todolist.ui.screens.todo
 
 import android.app.Activity
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +41,7 @@ import androidx.navigation.NavController
 import com.example.todolist.Data.DataClass.TodoGroup
 import com.example.todolist.Data.showToast
 import com.example.todolist.Screens
+import com.example.todolist.ui.components.LoadingDialog
 import com.example.todolist.ui.components.MenuFAB
 import com.example.todolist.ui.components.TodoGroupHeader
 import com.example.todolist.ui.components.TodoItem
@@ -51,6 +51,7 @@ import com.example.todolist.viewModel.TodoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun HomePage(
@@ -64,7 +65,8 @@ fun HomePage(
 
     //화면 변수
     val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
+    val width = configuration.screenWidthDp.dp
+    val height = configuration.screenHeightDp.dp
 
     //todos
     val todos = todoViewModel.todosByDate.collectAsState()
@@ -76,6 +78,18 @@ fun HomePage(
     var selectedDay = remember{mutableStateOf(todoViewModel.getSelectedDay())}
 
     val errorState = todoViewModel.errMsg.collectAsState()
+
+    val todoNumByDateList = todoViewModel.todosByDateList.collectAsState()
+
+    var showLoading by remember{mutableStateOf(false)}
+
+    if (showLoading){
+        LoadingDialog(
+            onDismissRequest = { showLoading = false },
+            width = width / 4,
+            height = height / 10
+        )
+    }
 
     //back event
     BackHandler {
@@ -129,6 +143,7 @@ fun HomePage(
                     IconButton(
                         onClick = {
                             todoViewModel.setPrevWeek()
+                            todoViewModel.getTodoNumByDate()
                         }
                     ) {
                         Icon(
@@ -143,6 +158,7 @@ fun HomePage(
                     IconButton(
                         onClick = {
                             todoViewModel.setNextWeek()
+                            todoViewModel.getTodoNumByDate()
                         }
                     ) {
                         Icon(
@@ -166,10 +182,13 @@ fun HomePage(
                     items = days.value,
                     onSlideNext = {
                         todoViewModel.setPrevWeek()
+                        todoViewModel.getTodoNumByDate()
                     },
                     onSlidePrev = {
                         todoViewModel.setNextWeek()
-                    }
+                        todoViewModel.getTodoNumByDate()
+                    },
+                    todoNumList = todoNumByDateList.value
                 )
             }
 
@@ -200,10 +219,12 @@ fun HomePage(
                             navController.navigate("${Screens.DescriptionPage.name}/${todo.todoNum}")
                         },
                         onDeleteClick = {
-//                            coroutineScope.launch(Dispatchers.IO){
-//
-//                            }
-                            todoViewModel.deleteTodo(todo.todoNum)
+                            showLoading = true
+                            runBlocking{
+                                todoViewModel.deleteTodo(todo.todoNum)
+                                todoViewModel.getTodoNumByDate()
+                                showLoading = false
+                            }
                         }
                     )
                 }
@@ -237,6 +258,5 @@ fun HomePage(
     LaunchedEffect(selectedDay.value){
         val dateString = "${selectedDay.value.year}-${selectedDay.value.month}-${selectedDay.value.day}"
         todoViewModel.fetchTodos(dateString)
-        Log.d(TAG, "fetch result : ${todos.value}")
     }
 }
