@@ -175,12 +175,13 @@ fun HomePage(
 
             Spacer(Modifier.height(10.dp))
 
-            /** 날짜에 맞는 TodoList */
-            var groupHeaderNum = 0
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ){
+                /** 날짜에 맞는 TodoList */
+                var groupHeaderNum = 0
                 items(todos.value){todo ->
+
                     //그룹 헤더를 보여주는 View
                     if (groupHeaderNum != todo.groupNum){
                         /** Api 확인해서 title을 가지고 todoGroup 정보를 가져올 수 있는지 확인 */
@@ -197,6 +198,12 @@ fun HomePage(
                         todo = todo,
                         onClick = {
                             navController.navigate("${Screens.DescriptionPage.name}/${todo.todoNum}")
+                        },
+                        onDeleteClick = {
+//                            coroutineScope.launch(Dispatchers.IO){
+//
+//                            }
+                            todoViewModel.deleteTodo(todo.todoNum)
                         }
                     )
                 }

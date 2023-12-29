@@ -99,6 +99,21 @@ class TodoRepository @Inject constructor(
         }
     }
 
+    //Todo 삭제
+    fun delTodo(token : String, todoNum : Int) : String{
+        try {
+            val result = todoApi.deleteTodo(token = token, todoNum = todoNum).execute()
+
+            return if (result.isSuccessful){
+                "삭제 성공"
+            } else {
+                "Error : ${result.code()}\n${result.errorBody()}"
+            }
+        } catch (e : Exception){
+            throw IllegalArgumentException(e.message)
+        }
+    }
+
     //todo group 추가
     fun addTodoGroup(token : String, title : String) : String {
         try{

@@ -221,7 +221,7 @@ class TodoViewModel @Inject constructor(
                     isFinished = false,
                     startDate = newStartDate,
                     desc = description,
-                    groupNum = todoGroup.groupNum,
+                    groupNum = if (todoGroup.groupNum == -1) null else todoGroup.groupNum,
                     location = location,
                     title = title
                 )
@@ -235,8 +235,18 @@ class TodoViewModel @Inject constructor(
                 }
                 //data fetch
                 _todoGroups.tryEmit(todoRepository.getGroups(token))
+
+                val tmpList = arrayListOf<Todo>()
+                todoGroups.value.forEach{
+                    tmpList.addAll(it.todoList)
+                }
+
+                _todos.tryEmit(tmpList)
             }
         }
+
+        val today = calendar.getToday()[0]
+        fetchTodos(today.substring(0,4) + "-" + today.substring(6,8) + "-" + today.substring(10,12))
     }
 
     //데이터 갱신
@@ -255,6 +265,37 @@ class TodoViewModel @Inject constructor(
             }
             _todosByDate.tryEmit(result)
         }
+    }
+
+    //todo 삭제
+    fun deleteTodo(
+        todoNum : Int
+    ){
+        val token = readAuthToken(context) ?: throw NullPointerException("Token is NULL on ${TAG} in deleteTodo")
+        runBlocking{
+            viewModelScope.launch(Dispatchers.IO){
+                val result = todoRepository.delTodo(token = token, todoNum = todoNum)
+                if (result != "삭제 성공") {
+                    _errMsg.tryEmit(result)
+                } else {
+                    _okMsg.tryEmit("삭제 성공")
+                }
+
+
+                //data fetch
+                _todoGroups.tryEmit(todoRepository.getGroups(token))
+
+                val tmpList = arrayListOf<Todo>()
+                todoGroups.value.forEach{
+                    tmpList.addAll(it.todoList)
+                }
+
+                _todos.tryEmit(tmpList)
+            }
+        }
+
+        val today = calendar.getToday()[0]
+        fetchTodos(today.substring(0,4) + "-" + today.substring(6,8) + "-" + today.substring(10,12))
     }
 
     //todo group 추가
